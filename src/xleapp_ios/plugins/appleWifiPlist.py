@@ -2,7 +2,7 @@ import logging
 import plistlib
 from dataclasses import dataclass
 
-from xleapp.abstract import AbstractArtifact
+from xleapp.artifacts.abstract import AbstractArtifact
 from xleapp.helpers.decorators import Search, timed
 from xleapp.report.webicons import Icon
 
@@ -168,8 +168,6 @@ class AppleWifiKnownNetworks(AbstractArtifact):
         '**/com.apple.wifi-private-mac-networks.plist',
     )
     def process(self):
-        if not isinstance(self.found, list):
-            self.found = [self.found]
 
         for fp in self.found:
             deserialized = plistlib.load(fp)
@@ -215,9 +213,6 @@ class AppleWifiScannedPrivate(AbstractArtifact):
         '**/com.apple.wifi-private-mac-networks.plist',
     )
     def process(self):
-        if not isinstance(self.found, list):
-            self.found = [self.found]
-
         for fp in self.found:
             deserialzied = plistlib.load(fp)
 

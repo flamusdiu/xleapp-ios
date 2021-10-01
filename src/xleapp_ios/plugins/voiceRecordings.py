@@ -2,7 +2,7 @@ import plistlib
 from dataclasses import dataclass
 from datetime import datetime
 
-from xleapp.abstract import AbstractArtifact
+from xleapp.artifacts.abstract import AbstractArtifact
 from xleapp.helpers.decorators import Search, timed
 from xleapp.report.webicons import Icon
 

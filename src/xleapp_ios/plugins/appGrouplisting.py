@@ -5,7 +5,7 @@ from dataclasses import dataclass
 
 import biplist
 
-from xleapp.abstract import AbstractArtifact
+from xleapp.artifacts.abstract import AbstractArtifact
 from xleapp.helpers.decorators import Search, timed
 from xleapp.report.webicons import Icon
 

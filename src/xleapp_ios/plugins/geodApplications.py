@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from xleapp.abstract import AbstractArtifact
+from xleapp.artifacts.abstract import AbstractArtifact
 from xleapp.helpers.decorators import Search, timed
 from xleapp.report.webicons import Icon
 
@@ -16,19 +16,19 @@ class GeodApplication(AbstractArtifact):
     @timed
     @Search('**/com.apple.geod/AP.db')
     def process(self):
-        fp = self.found
-        cursor = fp.cursor()
-        cursor.execute(
-            """
-            SELECT count_type, app_id, createtime
-            FROM mkcount
-            """,
-        )
+        for fp in self.found:
+            cursor = fp.cursor()
+            cursor.execute(
+                """
+                SELECT count_type, app_id, createtime
+                FROM mkcount
+                """,
+            )
 
-        all_rows = cursor.fetchall()
-        usageentries = len(all_rows)
-        if usageentries > 0:
-            data_list = []
-            for row in all_rows:
-                data_list.append((row[2], row[0], row[1]))
-            self.data = data_list
+            all_rows = cursor.fetchall()
+            usageentries = len(all_rows)
+            if usageentries > 0:
+                data_list = []
+                for row in all_rows:
+                    data_list.append((row[2], row[0], row[1]))
+                self.data = data_list

@@ -3,7 +3,7 @@ import plistlib
 from dataclasses import dataclass
 
 import xleapp.globals as g
-from xleapp.abstract import AbstractArtifact
+from xleapp.artifacts.abstract import AbstractArtifact
 from xleapp.helpers.decorators import Search, core_artifact, timed
 
 
@@ -20,13 +20,13 @@ class LastBuild(AbstractArtifact):
     def process(self):
         data_list = []
         device_info = g.device
-        fp = self.found
-        pl = plistlib.load(fp)
-        for key, value in pl.items():
-            data_list.append((key, value))
-            if key in ['ProductVersion', 'ProductBuildVersion', 'ProductName']:
-                device_info.update({key: value})
-        self.data = data_list
+        for fp in self.found:
+            pl = plistlib.load(fp)
+            for key, value in pl.items():
+                data_list.append((key, value))
+                if key in ['ProductVersion', 'ProductBuildVersion', 'ProductName']:
+                    device_info.update({key: value})
+            self.data = data_list
 
 
 @core_artifact

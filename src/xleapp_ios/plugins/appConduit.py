@@ -2,7 +2,7 @@ import datetime
 import re
 from dataclasses import dataclass
 
-from xleapp.abstract import AbstractArtifact
+from xleapp.artifacts.abstract import AbstractArtifact
 from xleapp.helpers.decorators import Search, timed
 from xleapp.report.webicons import Icon
 

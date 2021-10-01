@@ -5,7 +5,7 @@ import struct
 import zlib
 from dataclasses import dataclass
 
-from xleapp.abstract import AbstractArtifact
+from xleapp.artifacts.abstract import AbstractArtifact
 from xleapp.helpers.decorators import Search, timed
 from xleapp.report.webicons import Icon
 
@@ -35,60 +35,61 @@ class GeodMapTiles(AbstractArtifact):
     @timed
     @Search('**/com.apple.geod/MapTiles/MapTiles.sqlitedb')
     def process(self):
-        fp = self.found
-        cursor = fp.cursor()
-        cursor.execute(
-            """
-            SELECT datetime(access_times.timestamp, 'unixepoch') as timestamp, key_a, key_b, key_c, key_d, tileset, data, size, etag
-            FROM data
-            INNER JOIN access_times on data.rowid = access_times.data_pk
-            """,
-        )
+        for fp in self.found:
+            cursor = fp.cursor()
+            cursor.execute(
+                """
+                SELECT datetime(access_times.timestamp, 'unixepoch') as timestamp, key_a, key_b, key_c, key_d, tileset, data, size, etag
+                FROM data
+                INNER JOIN access_times on data.rowid = access_times.data_pk
+                """,
+            )
 
-        all_rows = cursor.fetchall()
-        usageentries = len(all_rows)
-        data_list = []
-        if usageentries > 0:
-            for row in all_rows:
-                tcol_places = ''
-                vmp4_places = ''
-                data_parsed = ''
+            all_rows = cursor.fetchall()
+            usageentries = len(all_rows)
+            data_list = []
+            if usageentries > 0:
+                for row in all_rows:
+                    tcol_places = ''
+                    vmp4_places = ''
+                    data_parsed = ''
 
-                data = row['data']
-                if data:  # NULL sometimes
-                    if (
-                        len(data) >= 11
-                        and data[:11] == b'\xff\xd8\xff\xe0\x00\x10\x4a\x46\x49\x46\x00'
-                    ):
-                        img_base64 = base64.b64encode(data).decode('utf-8')
-                        img_html = f'<img src="data:image/jpeg;base64, {img_base64}" alt="Map Tile" />'
-                        data_parsed = img_html
-                    elif len(data) >= 4 and data[:4] == b'TCOL':
-                        vmp4_places, tcol_places = parsetcol(data)
-                        vmp4_places = ", ".join(vmp4_places)
-                        tcol_places = ", ".join(tcol_places)
-                    elif len(data) >= 4 and data[:4] == b'VMP4':
-                        vmp4_places = parsevmp4(data)
-                        vmp4_places = ", ".join(vmp4_places)
-                # else:
-                # header_bytes = data[:28]
-                # hexdump = generate_hexdump(header_bytes, 5) if header_bytes else ''
-                # data_parsed = hexdump
+                    data = row['data']
+                    if data:  # NULL sometimes
+                        if (
+                            len(data) >= 11
+                            and data[:11]
+                            == b'\xff\xd8\xff\xe0\x00\x10\x4a\x46\x49\x46\x00'
+                        ):
+                            img_base64 = base64.b64encode(data).decode('utf-8')
+                            img_html = f'<img src="data:image/jpeg;base64, {img_base64}" alt="Map Tile" />'
+                            data_parsed = img_html
+                        elif len(data) >= 4 and data[:4] == b'TCOL':
+                            vmp4_places, tcol_places = parsetcol(data)
+                            vmp4_places = ", ".join(vmp4_places)
+                            tcol_places = ", ".join(tcol_places)
+                        elif len(data) >= 4 and data[:4] == b'VMP4':
+                            vmp4_places = parsevmp4(data)
+                            vmp4_places = ", ".join(vmp4_places)
+                    # else:
+                    # header_bytes = data[:28]
+                    # hexdump = generate_hexdump(header_bytes, 5) if header_bytes else ''
+                    # data_parsed = hexdump
 
-                data_list.append(
-                    (
-                        row['timestamp'],
-                        tcol_places,
-                        vmp4_places,
-                        data_parsed,
-                        get_hex(row['tileset']),
-                        get_hex(row['key_a']),
-                        get_hex(row['key_b']),
-                        get_hex(row['key_c']),
-                        get_hex(row['key_d']),
-                    ),
-                )
-            self.data = data_list
+                    data_list.append(
+                        (
+                            row['timestamp'],
+                            tcol_places,
+                            vmp4_places,
+                            data_parsed,
+                            get_hex(row['tileset']),
+                            get_hex(row['key_a']),
+                            get_hex(row['key_b']),
+                            get_hex(row['key_c']),
+                            get_hex(row['key_d']),
+                        ),
+                    )
+                self.data = data_list
 
 
 def readvloc(data) -> list:

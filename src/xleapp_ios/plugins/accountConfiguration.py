@@ -1,7 +1,7 @@
 import plistlib
 from dataclasses import dataclass
 
-from xleapp.abstract import AbstractArtifact
+from xleapp.artifacts.abstract import AbstractArtifact
 from xleapp.helpers.decorators import Search, timed
 from xleapp.report.webicons import Icon
 
@@ -18,9 +18,9 @@ class AccountConfiguration(AbstractArtifact):
     def process(self):
         data_list = []
 
-        fp = self.found
-        pl = plistlib.load(fp)
-        for key, value in pl.items():
-            data_list.append((key, value))
+        for fp in self.found:
+            pl = plistlib.load(fp)
+            for key, value in pl.items():
+                data_list.append((key, value))
 
         self.data = data_list
