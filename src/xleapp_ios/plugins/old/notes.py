@@ -1,13 +1,13 @@
 from html_report.artifact_report import ArtifactHtmlReport
 from helpers import tsv, timeline, open_sqlite_db_readonly
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class Notes (ab.AbstractArtifact):
+class Notes(ab.Artifact):
 
     _name = 'Notes'
-    _search_dirs = ('*/NoteStore.sqlite')
+    _search_dirs = '*/NoteStore.sqlite'
     _category = 'Notes'
 
     def get(self, files_found, seeker):
@@ -15,7 +15,8 @@ class Notes (ab.AbstractArtifact):
         for file_found in files_found:
             db = open_sqlite_db_readonly(file_found)
             cursor = db.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT
                 DATETIME(TabA.ZCREATIONDATE1+978307200,'UNIXEPOCH'),
                 TabA.ZTITLE1,
@@ -43,24 +44,53 @@ class Notes (ab.AbstractArtifact):
                 INNER JOIN ZICCLOUDSYNCINGOBJECT TabC on TabA.ZACCOUNT3 = TabC.Z_PK
                 LEFT JOIN ZICCLOUDSYNCINGOBJECT TabD on TabA.Z_PK = TabD.ZNOTE
                 WHERE TabA.ZTITLE1 <> ''
-                """)
+                """
+            )
 
             all_rows = cursor.fetchall()
         if len(all_rows) > 0:
             for row in all_rows:
                 if row[8] is not None:
-                    filesize = '.'.join(str(row[8])[i:i+3] for i in range(0, len(str(row[8])), 3))
+                    filesize = '.'.join(
+                        str(row[8])[i : i + 3] for i in range(0, len(str(row[8])), 3)
+                    )
                 else:
                     filesize = ''
-                data_list.append((row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], filesize, row[9], row[10], row[11]))
+                data_list.append(
+                    (
+                        row[0],
+                        row[1],
+                        row[2],
+                        row[3],
+                        row[4],
+                        row[5],
+                        row[6],
+                        row[7],
+                        filesize,
+                        row[9],
+                        row[10],
+                        row[11],
+                    )
+                )
 
         if len(data_list) > 0:
             report = ArtifactHtmlReport('Notes')
             report.start_artifact_report(report_folder, 'Notes')
             report.add_script()
-            data_headers = ('Creation Date', 'Note', 'Folder', 'Storage Place', 'Last Modified', 'Password Protected',
-                            'Marked for Deletion', 'Pinned', 'Attachment Size in KB', 'Attachment Type',
-                            'Attachment Creation Date', 'Attachment Last Modified')
+            data_headers = (
+                'Creation Date',
+                'Note',
+                'Folder',
+                'Storage Place',
+                'Last Modified',
+                'Password Protected',
+                'Marked for Deletion',
+                'Pinned',
+                'Attachment Size in KB',
+                'Attachment Type',
+                'Attachment Creation Date',
+                'Attachment Last Modified',
+            )
             report.write_artifact_data_table(data_headers, data_list, file_found)
             report.end_artifact_report()
 

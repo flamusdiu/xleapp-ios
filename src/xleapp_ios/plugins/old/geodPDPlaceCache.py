@@ -1,14 +1,13 @@
 from html_report.artifact_report import ArtifactHtmlReport
-from helpers import( open_sqlite_db_readonly, strings,
-                             timeline, tsv)
+from helpers import open_sqlite_db_readonly, strings, timeline, tsv
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class GeodPDPlaceCache(ab.AbstractArtifact):
+class GeodPDPlaceCache(ab.Artifact):
 
     _name = 'PD Place Cache'
-    _search_dirs = ('**/PDPlaceCache.db')
+    _search_dirs = '**/PDPlaceCache.db'
     _category = 'Geolocation'
 
     def get(self, files_found, seeker):
@@ -20,7 +19,8 @@ class GeodPDPlaceCache(ab.AbstractArtifact):
             SELECT requestkey, pdplacelookup.pdplacehash, datetime('2001-01-01', "lastaccesstime" || ' seconds') as lastaccesstime, datetime('2001-01-01', "expiretime" || ' seconds') as expiretime, pdplace
             FROM pdplacelookup
             INNER JOIN pdplaces on pdplacelookup.pdplacehash = pdplaces.pdplacehash
-            """)
+            """
+        )
 
         all_rows = cursor.fetchall()
         usageentries = len(all_rows)
@@ -33,8 +33,16 @@ class GeodPDPlaceCache(ab.AbstractArtifact):
             report = ArtifactHtmlReport('Geolocation')
             report.start_artifact_report(report_folder, 'PD Place Cache', description)
             report.add_script()
-            data_headers = ("last access time", "requestkey", "pdplacehash", "expire time", "pd place")
-            report.write_artifact_data_table(data_headers, data_list, file_found, html_escape=False)
+            data_headers = (
+                "last access time",
+                "requestkey",
+                "pdplacehash",
+                "expire time",
+                "pd place",
+            )
+            report.write_artifact_data_table(
+                data_headers, data_list, file_found, html_escape=False
+            )
             report.end_artifact_report()
 
             tsvname = 'Geolocation PD Place Caches'

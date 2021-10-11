@@ -2,24 +2,22 @@ import plistlib
 from dataclasses import dataclass
 from datetime import datetime
 
-from xleapp.artifacts.abstract import AbstractArtifact
-from xleapp.helpers.decorators import Search, timed
-from xleapp.report.webicons import Icon
+from xleapp import Artifact, WebIcon, Search, timed
 
 
 @dataclass
-class VoiceRecording(AbstractArtifact):
+class VoiceRecording(Artifact):
     def __post_init__(self):
-        self.name = 'Voice Recordings'
-        self.category = 'Voice-Recordings'
-        self.report_headers = ('Creation Date', 'Title', 'Path to File', 'Audio File')
-        self.report_title = 'Voice Recordings'
-        self.web_icon = Icon.MIC
+        self.name = "Voice Recordings"
+        self.category = "Voice-Recordings"
+        self.report_headers = ("Creation Date", "Title", "Path to File", "Audio File")
+        self.report_title = "Voice Recordings"
+        self.web_icon = WebIcon.MIC
 
     @timed
     @Search(
-        '**/Recordings/*.composition/manifest.plist',
-        '**/Recordings/*.m4a',
+        "**/Recordings/*.composition/manifest.plist",
+        "**/Recordings/*.m4a",
         file_names_only=True,
     )
     def process(self):
@@ -28,12 +26,12 @@ class VoiceRecording(AbstractArtifact):
         m4a_files = []
 
         for file_found in self.found:
-            if file_found.suffix('.plist'):
-                plist_files.append(file_found)
-            elif file_found.suffix('.m4a'):
-                m4a_filename = file_found
-                if ' ' in m4a_filename:
-                    m4a_filename = m4a_filename.replace(' ', '_')
+            if file_found().suffix(".plist"):
+                plist_files.append(file_found())
+            elif file_found.suffix(".m4a"):
+                m4a_filename = file_found()
+                if " " in m4a_filename:
+                    m4a_filename = m4a_filename.replace(" ", "_")
                 m4a_files.append(m4a_files)
                 self.copyfile(file_found, m4a_filename)
 
@@ -43,20 +41,20 @@ class VoiceRecording(AbstractArtifact):
         for plist_file, m4a_file in zip(plist_files, m4a_files):
             with open(plist_file, "rb") as file:
                 pl = plistlib.load(file)
-                ct = unix_epoch_to_readable_date(pl['RCSavedRecordingCreationTime'])
+                ct = unix_epoch_to_readable_date(pl["RCSavedRecordingCreationTime"])
 
                 audio = (
-                    '<audio controls>'
+                    "<audio controls>"
                     f'<source src="{m4a_file}" type="audio/wav">'
-                    '<p>Your browser does not support HTML5'
-                    'audio elements.</p></audio>'
+                    "<p>Your browser does not support HTML5"
+                    "audio elements.</p></audio>"
                 )
 
                 data_list.append(
                     (
                         ct,
-                        pl['RCSavedRecordingTitle'],
-                        pl['RCComposedAVURL'].split('//')[1],
+                        pl["RCSavedRecordingTitle"],
+                        pl["RCComposedAVURL"].split("//")[1],
                         audio,
                     ),
                 )
@@ -66,5 +64,5 @@ class VoiceRecording(AbstractArtifact):
 
 def unix_epoch_to_readable_date(unix_epoch_time):
     unix_time = float(unix_epoch_time + 978307200)
-    readable_time = datetime.utcfromtimestamp(unix_time).strftime('%Y-%m-%d %H:%M:%S')
+    readable_time = datetime.utcfromtimestamp(unix_time).strftime("%Y-%m-%d %H:%M:%S")
     return readable_time

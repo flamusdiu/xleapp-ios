@@ -4,13 +4,15 @@ from os.path import dirname
 from html_report.artifact_report import ArtifactHtmlReport
 from helpers import timeline, tsv
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class KeyboardLexicon(ab.AbstractArtifact):
+class KeyboardLexicon(ab.Artifact):
 
     _name = 'Keyboard Dynamic Lexicon'
-    _search_dirs = ('*/private/var/mobile/Library/Keyboard/*-dynamic.lm/dynamic-lexicon.dat')
+    _search_dirs = (
+        '*/private/var/mobile/Library/Keyboard/*-dynamic.lm/dynamic-lexicon.dat'
+    )
     _category = 'Keyboard Dynamic Lexicon'
 
     def get(self, files_found, seeker):
@@ -46,7 +48,12 @@ class KeyboardLexicon(ab.AbstractArtifact):
             report.start_artifact_report(report_folder, 'Keyboard Dynamic Lexicon')
             report.add_script()
             data_headers = ('Found Strings', 'File Location')
-            report.write_artifact_data_table(data_headers, data_list, dir_file_found, html_no_escape=['Found Strings'])
+            report.write_artifact_data_table(
+                data_headers,
+                data_list,
+                dir_file_found,
+                html_no_escape=['Found Strings'],
+            )
             report.end_artifact_report()
 
             tsvname = 'Keyboard Dynamic Lexicon'

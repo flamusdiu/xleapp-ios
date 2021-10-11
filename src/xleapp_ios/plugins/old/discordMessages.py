@@ -5,15 +5,15 @@ from helpers import timeline, tsv
 from xleapp.html_report import Icon
 from html_report.artifact_report import ArtifactHtmlReport
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class DiscordMessages(ab.AbstractArtifact):
+class DiscordMessages(ab.Artifact):
 
     _name = 'Discord Messages'
     _search_dirs = '*/com.hammerandchisel.discord/fsCachedData/*'
     _category = 'Discord'
-    _web_icon = Icon.MESSAGE_SQUARE
+    _web_icon = WebIcon.MESSAGE_SQUARE
 
     def __init__(self):
         super().__init__(self)

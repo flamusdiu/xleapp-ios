@@ -6,15 +6,14 @@ import plistlib
 import sqlite3
 
 from html_report.artifact_report import ArtifactHtmlReport
-from helpers import(is_platform_windows,
-                             open_sqlite_db_readonly, timeline, tsv)
+from helpers import is_platform_windows, open_sqlite_db_readonly, timeline, tsv
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class SafariBookmarks (ab.AbstractArtifact):
+class SafariBookmarks(ab.Artifact):
     _name = 'Safari Browser Bookmarks'
-    _search_dirs = ('**/Safari/Bookmarks.db')
+    _search_dirs = '**/Safari/Bookmarks.db'
     _category = 'Safari Browser'
 
     def get(self, files_found, seeker):
@@ -22,14 +21,16 @@ class SafariBookmarks (ab.AbstractArtifact):
         db = open_sqlite_db_readonly(file_found)
         cursor = db.cursor()
 
-        cursor.execute("""
+        cursor.execute(
+            """
         SELECT
             title,
             url,
             hidden
         FROM
         bookmarks
-                """)
+                """
+        )
 
         all_rows = cursor.fetchall()
         usageentries = len(all_rows)
@@ -42,7 +43,7 @@ class SafariBookmarks (ab.AbstractArtifact):
             report = ArtifactHtmlReport('Safari Browser Bookmarks')
             report.start_artifact_report(report_folder, 'Bookmarks', description)
             report.add_script()
-            data_headers = ('Title','URL','Hidden')
+            data_headers = ('Title', 'URL', 'Hidden')
             report.write_artifact_data_table(data_headers, data_list, file_found)
             report.end_artifact_report()
 

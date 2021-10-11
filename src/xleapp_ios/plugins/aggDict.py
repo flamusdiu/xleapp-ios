@@ -1,29 +1,27 @@
 from dataclasses import dataclass
 
-from xleapp.artifacts.abstract import AbstractArtifact
-from xleapp.helpers.decorators import Search, timed
-from xleapp.report.webicons import Icon
+from xleapp import Artifact, WebIcon, Search, timed
 
 
 @dataclass
-class AggDict(AbstractArtifact):
+class AggDict(Artifact):
     def __post_init__(self):
-        self.name = 'Aggregate Dictionary'
-        self.category = 'Aggregate Dictionary'
-        self.web_icon = Icon.BOOK
+        self.name = "Aggregate Dictionary"
+        self.category = "Aggregate Dictionary"
+        self.web_icon = WebIcon.BOOK
         self.report_headers = (
-            'Day',
-            'Key',
-            'Value',
-            'Seconds in Day Offset',
-            'Distribution Values Table ID',
+            "Day",
+            "Key",
+            "Value",
+            "Seconds in Day Offset",
+            "Distribution Values Table ID",
         )
 
     @timed
-    @Search('*/AggregateDictionary/ADDataStore.sqlitedb')
+    @Search("*/AggregateDictionary/ADDataStore.sqlitedb")
     def process(self):
         for fp in self.found:
-            cursor = fp.cursor()
+            cursor = fp().cursor()
 
             cursor.execute(
                 """

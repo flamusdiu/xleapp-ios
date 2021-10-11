@@ -5,19 +5,17 @@ import struct
 import zlib
 from dataclasses import dataclass
 
-from xleapp.artifacts.abstract import AbstractArtifact
-from xleapp.helpers.decorators import Search, timed
-from xleapp.report.webicons import Icon
+from xleapp import Artifact, WebIcon, Search, timed
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("xleapp.logfile")
 
 
 @dataclass
-class GeodMapTiles(AbstractArtifact):
+class GeodMapTiles(Artifact):
     def __post_init__(self):
-        self.name = 'GeoD Map Tiles'
-        self.category = 'Geolocation'
-        self.web_icon = Icon.MAP
+        self.name = "GeoD Map Tiles"
+        self.category = "Geolocation"
+        self.web_icon = WebIcon.MAP
         self.report_headers = (
             "Timestamp",
             "Places_from_VLOC",
@@ -33,10 +31,10 @@ class GeodMapTiles(AbstractArtifact):
         )
 
     @timed
-    @Search('**/com.apple.geod/MapTiles/MapTiles.sqlitedb')
+    @Search("**/com.apple.geod/MapTiles/MapTiles.sqlitedb")
     def process(self):
         for fp in self.found:
-            cursor = fp.cursor()
+            cursor = fp().cursor()
             cursor.execute(
                 """
                 SELECT datetime(access_times.timestamp, 'unixepoch') as timestamp, key_a, key_b, key_c, key_d, tileset, data, size, etag
@@ -50,25 +48,25 @@ class GeodMapTiles(AbstractArtifact):
             data_list = []
             if usageentries > 0:
                 for row in all_rows:
-                    tcol_places = ''
-                    vmp4_places = ''
-                    data_parsed = ''
+                    tcol_places = ""
+                    vmp4_places = ""
+                    data_parsed = ""
 
-                    data = row['data']
+                    data = row["data"]
                     if data:  # NULL sometimes
                         if (
                             len(data) >= 11
                             and data[:11]
-                            == b'\xff\xd8\xff\xe0\x00\x10\x4a\x46\x49\x46\x00'
+                            == b"\xff\xd8\xff\xe0\x00\x10\x4a\x46\x49\x46\x00"
                         ):
-                            img_base64 = base64.b64encode(data).decode('utf-8')
+                            img_base64 = base64.b64encode(data).decode("utf-8")
                             img_html = f'<img src="data:image/jpeg;base64, {img_base64}" alt="Map Tile" />'
                             data_parsed = img_html
-                        elif len(data) >= 4 and data[:4] == b'TCOL':
+                        elif len(data) >= 4 and data[:4] == b"TCOL":
                             vmp4_places, tcol_places = parsetcol(data)
                             vmp4_places = ", ".join(vmp4_places)
                             tcol_places = ", ".join(tcol_places)
-                        elif len(data) >= 4 and data[:4] == b'VMP4':
+                        elif len(data) >= 4 and data[:4] == b"VMP4":
                             vmp4_places = parsevmp4(data)
                             vmp4_places = ", ".join(vmp4_places)
                     # else:
@@ -78,15 +76,15 @@ class GeodMapTiles(AbstractArtifact):
 
                     data_list.append(
                         (
-                            row['timestamp'],
+                            row["timestamp"],
                             tcol_places,
                             vmp4_places,
                             data_parsed,
-                            get_hex(row['tileset']),
-                            get_hex(row['key_a']),
-                            get_hex(row['key_b']),
-                            get_hex(row['key_c']),
-                            get_hex(row['key_d']),
+                            get_hex(row["tileset"]),
+                            get_hex(row["key_a"]),
+                            get_hex(row["key_b"]),
+                            get_hex(row["key_c"]),
+                            get_hex(row["key_d"]),
                         ),
                     )
                 self.data = data_list
@@ -101,11 +99,11 @@ def readvloc(data) -> list:
             skip_len = 2
         else:
             skip_len = 3
-        end_pos = data[pos + skip_len :].find(b'\0')
+        end_pos = data[pos + skip_len :].find(b"\0")
         if end_pos >= 0:
             name = data[pos + skip_len : pos + skip_len + end_pos].decode(
-                'utf8',
-                'ignore',
+                "utf8",
+                "ignore",
             )
             if name:
                 names.append(name)
@@ -119,23 +117,20 @@ def parsetcol(data) -> tuple:
     tcol_places = []
     data_size = len(data)
     if data_size >= 8:
-        tcol_data_offset = struct.unpack('<I', data[4:8])[0]
+        tcol_data_offset = struct.unpack("<I", data[4:8])[0]
         tcol_compressed_data = data[tcol_data_offset:]
         if tcol_compressed_data:
             try:
                 tcol_places = gzip.decompress(tcol_compressed_data)
             except (OSError, EOFError, zlib.error) as ex:
-                logging.error(
-                    f'Gzip decompression error from parsetcol() - {str(ex)}',
-                    extra={'flow': 'no_filter'},
-                )
-                tcol_places = ''
+                logger.info(f"Gzip decompression error from parsetcol() - {str(ex)}")
+                tcol_places = ""
         vmp4_places = parsevmp4(data[8:tcol_data_offset])
         return vmp4_places, readvloc(tcol_places)
 
 
 def parsevmp4(data):
-    num_items = struct.unpack('<H', data[6:8])[0]
+    num_items = struct.unpack("<H", data[6:8])[0]
     pos = 8
     for _item in range(num_items):
         item_type, offset, size = struct.unpack("<HII", data[pos : pos + 10])
@@ -147,14 +142,14 @@ def parsevmp4(data):
                     places_data = zlib.decompress(compressed_data)
                 except zlib.error as ex:
                     logging.error(
-                        f'Zlib decompression error from parsevmp4() - {str(ex)}',
+                        f"Zlib decompression error from parsevmp4() - {str(ex)}",
                     )
-                    places_data = ''
+                    places_data = ""
             else:
                 places_data = item_data[1:]
             return [
-                x.decode('UTF8', 'ignore')
-                for x in places_data.rstrip(b'\0').split(b'\0')
+                x.decode("UTF8", "ignore")
+                for x in places_data.rstrip(b"\0").split(b"\0")
             ]
         pos += 10
     return []
@@ -163,4 +158,4 @@ def parsevmp4(data):
 def get_hex(num):
     if num:
         return hex(num).upper()
-    return ''
+    return ""

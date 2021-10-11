@@ -4,13 +4,13 @@ from helpers import open_sqlite_db_readonly
 
 import artifacts.artGlobals  # use to get iOS version -> iOSversion = artifacts.artGlobals.versionf
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class TCC (ab.AbstractArtifact):
+class TCC(ab.Artifact):
 
     _name = 'TCC - Permissions'
-    _search_dirs = ('*TCC.db*')
+    _search_dirs = '*TCC.db*'
     _category = 'App Permissions'
 
     def get(self, files_found, seeker):
@@ -20,13 +20,15 @@ class TCC (ab.AbstractArtifact):
         iOSversion = artifacts.artGlobals.versionf
         if version.parse(iOSversion) >= version.parse("9"):
             cursor = db.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
             select client,
             service,
             datetime(last_modified,'unixepoch')
             from access
             order by client
-            """)
+            """
+            )
 
             all_rows = cursor.fetchall()
             usageentries = len(all_rows)
@@ -39,8 +41,10 @@ class TCC (ab.AbstractArtifact):
                 report = ArtifactHtmlReport('TCC - Permissions')
                 report.start_artifact_report(report_folder, 'TCC - Permissions')
                 report.add_script()
-                data_headers = ('Bundle ID','Permissions', 'Last Modified Timestamp')
-                report.write_artifact_data_table(data_headers, data_list, file_found, html_escape=False)
+                data_headers = ('Bundle ID', 'Permissions', 'Last Modified Timestamp')
+                report.write_artifact_data_table(
+                    data_headers, data_list, file_found, html_escape=False
+                )
                 report.end_artifact_report()
 
                 """

@@ -4,15 +4,14 @@ import pathlib
 import sqlite3
 
 from html_report.artifact_report import ArtifactHtmlReport
-from helpers import(is_platform_windows, kmlgen,
-                             open_sqlite_db_readonly, timeline, tsv)
+from helpers import is_platform_windows, kmlgen, open_sqlite_db_readonly, timeline, tsv
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class OoklaSpeedtestData (ab.AbstractArtifact):
+class OoklaSpeedtestData(ab.Artifact):
     _name = 'Ooka Speedtest'
-    _search_dirs = ('**/speedtest.sqlite*')
+    _search_dirs = '**/speedtest.sqlite*'
     _category = 'Applications'
 
     def get(files_found, report_folder, seeker):
@@ -24,7 +23,8 @@ class OoklaSpeedtestData (ab.AbstractArtifact):
 
         db = open_sqlite_db_readonly(file_found)
         cursor = db.cursor()
-        cursor.execute("""
+        cursor.execute(
+            """
         SELECT
             datetime(("ZDATE")+strftime('%s', '2001-01-01 00:00:00'), 'unixepoch') as 'Date',
             "ZEXTERNALIP" as 'External IP Address',
@@ -150,20 +150,49 @@ class OoklaSpeedtestData (ab.AbstractArtifact):
             FROM ZSPEEDTESTRESULT
 
             ORDER BY "ZDATE" DESC
-        """)
+        """
+        )
 
         all_rows = cursor.fetchall()
         usageentries = len(all_rows)
         data_list = []
         if usageentries > 0:
             for row in all_rows:
-                data_list.append((row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10]))
+                data_list.append(
+                    (
+                        row[0],
+                        row[1],
+                        row[2],
+                        row[3],
+                        row[4],
+                        row[5],
+                        row[6],
+                        row[7],
+                        row[8],
+                        row[9],
+                        row[10],
+                    )
+                )
 
                 description = ''
                 report = ArtifactHtmlReport('Applications')
-                report.start_artifact_report(report_folder, 'Ookla Speedtest', description)
+                report.start_artifact_report(
+                    report_folder, 'Ookla Speedtest', description
+                )
                 report.add_script()
-                data_headers = ('Timestamp','External IP Address','Internal IP Address','Carrier Name','ISP','Wifi SSID','WAN Type','Device Model','Latitude','Longitude','Accuracy in Meters' )
+                data_headers = (
+                    'Timestamp',
+                    'External IP Address',
+                    'Internal IP Address',
+                    'Carrier Name',
+                    'ISP',
+                    'Wifi SSID',
+                    'WAN Type',
+                    'Device Model',
+                    'Latitude',
+                    'Longitude',
+                    'Accuracy in Meters',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 

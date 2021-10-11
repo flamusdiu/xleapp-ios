@@ -1,30 +1,28 @@
 from dataclasses import dataclass
 
-from xleapp.artifacts.abstract import AbstractArtifact
-from xleapp.helpers.decorators import Search, timed
-from xleapp.report.webicons import Icon
+from xleapp import Artifact, Search, WebIcon, timed
 
 
 @dataclass
-class Accounts(AbstractArtifact):
+class Accounts(Artifact):
     def __post_init__(self):
-        self.name = 'Accounts'
-        self.category = 'Accounts'
-        self.web_icon = Icon.USER
+        self.name = "Accounts"
+        self.category = "Accounts"
+        self.web_icon = WebIcon.USER
         self.report_headers = (
-            'Timestamp',
-            'Account Desc.',
-            'Username',
-            'Description',
-            'Identifier',
-            'Bundle ID',
+            "Timestamp",
+            "Account Desc.",
+            "Username",
+            "Description",
+            "Identifier",
+            "Bundle ID",
         )
 
     @timed
-    @Search('**/Accounts3.sqlite')
+    @Search("**/Accounts3.sqlite")
     def process(self):
         for fp in self.found:
-            cursor = fp.cursor()
+            cursor = fp().cursor()
             cursor.execute(
                 """
                 select

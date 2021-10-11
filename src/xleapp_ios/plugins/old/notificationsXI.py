@@ -6,11 +6,12 @@ from html_report.artifact_report import ArtifactHtmlReport
 from helpers.parsers import cclparser
 from helpers import logfunc
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
-class NotificationsXI (ab.AbstractArtifact):
+
+class NotificationsXI(ab.Artifact):
     _name = 'iOS Notifications'
-    _search_dirs = ('*PushStore*')
+    _search_dirs = '*PushStore*'
     _report_section = 'Notifications'
 
     def get(files_found, seeker):
@@ -149,7 +150,8 @@ class NotificationsXI (ab.AbstractArtifact):
                                     dia = str(plist2[i]["NS.time"])
                                     dias = dia.rsplit(".", 1)[0]
                                     timestamp = (
-                                        datetime.datetime.fromtimestamp(int(dias)) + delta
+                                        datetime.datetime.fromtimestamp(int(dias))
+                                        + delta
                                     )
                                     # logfunc (timestamp)
 
@@ -265,7 +267,9 @@ class NotificationsXI (ab.AbstractArtifact):
                                             secondplist = cclparser.load(procfile)
                                             secondplistint = secondplist["$objects"]
                                             # logfunc("Bplist processed and exported.")
-                                            exportedbplistcount = exportedbplistcount + 1
+                                            exportedbplistcount = (
+                                                exportedbplistcount + 1
+                                            )
                                             h.write('<tr name="hide">')
                                             h.write("<td>NS.data</td>")
                                             h.write("<td>")
@@ -289,15 +293,17 @@ class NotificationsXI (ab.AbstractArtifact):
                         test = 0  # future development
 
         path = self.report_folder
-        level2, level1 = (os.path.split(path))
+        level2, level1 = os.path.split(path)
 
         # final = level2+'/'+level1
         dict = {}
         files = os.listdir(path)
         for name in files:
             try:
-                size = os.path.getsize(f"{path}{name}/DeliveredNotificationsReport.html")
-                key = (f'<a href = "{level2}/{name}/DeliveredNotificationsReport.html" style = "color:blue" target="content">{name}</a>')
+                size = os.path.getsize(
+                    f"{path}{name}/DeliveredNotificationsReport.html"
+                )
+                key = f'<a href = "{level2}/{name}/DeliveredNotificationsReport.html" style = "color:blue" target="content">{name}</a>'
                 dict[key] = size
             except NotADirectoryError as nade:
                 logfunc(nade)
@@ -312,10 +318,14 @@ class NotificationsXI (ab.AbstractArtifact):
         location = pathfound
         description = 'iOS <= 11 Notifications'
         report = ArtifactHtmlReport('iOS Notificatons')
-        report.start_artifact_report(self.report_folder, 'iOS Notifications', description)
+        report.start_artifact_report(
+            self.report_folder, 'iOS Notifications', description
+        )
         report.add_script()
         data_headers = ('Bundle GUID', 'Reports Size')
-        report.write_artifact_data_table(data_headers, data_list, location, html_escape=False)
+        report.write_artifact_data_table(
+            data_headers, data_list, location, html_escape=False
+        )
         report.end_artifact_report()
 
         logfunc("Total notification directories processed:" + str(notdircount))
@@ -323,51 +333,53 @@ class NotificationsXI (ab.AbstractArtifact):
         if notdircount == 0:
             logfunc("No notifications located.")
 
-NotificationParams = ['AppNotificationAttachments',
-                      'AppNotificationBadgeNumber',
-                      'AppNotificationContentAvailable',
-                      'AppNotificationCreationDate',
-                      'AppNotificationIdentifier',
-                      'AppNotificationMessage',
-                      'AppNotificationMessageLocalizationArguments',
-                      'AppNotificationMessageLocazationKey',
-                      'AppNotificationMutableContent',
-                      'AppNotificationSummaryArgument',
-                      'AppNotificationSummaryArgumentCount',
-                      'AppNotificationTitle',
-                      'BadgeApplicationIcon',
-                      'CriticalAlertSound',
-                      'HasDefaultActionKey',
-                      'Header',
-                      'SBSPushStoreNotificationCategoryKey',
-                      'SBSPushStoreNotificationThreadKey',
-                      'SchemaVersion',
-                      'ShouldAuthenticateDefaultAction',
-                      'ShouldBackgroundDefaultAction',
-                      'ShouldHideDate',
-                      'ShouldHideTime',
-                      'ShouldIgnoreDoNotDisturb',
-                      'ShouldIgnoreDowntime',
-                      'ShouldPlaySound',
-                      'ShouldPresentAlert',
-                      'ShouldPreventNotificationDismissalAfterDefaultAction',
-                      'ShouldSuppressScreenLightUp',
-                      'ShouldSuppressSyncDismissalWhenRemoved',
-                      'ShouldUseRequestIdentifierForDismissalSync',
-                      'SoundMaximumDuration',
-                      'SoundShouldIgnoreRingerSwitch',
-                      'SoundShouldRepeat',
-                      'ToneAlertType',
-                      'ToneFileName',
-                      'ToneMediaLibraryItemIdentifier',
-                      'TriggerRepeatInterval',
-                      'TriggerRepeats',
-                      'TriggerTimeInterval',
-                      'UNNotificationAlertDestination',
-                      'UNNotificationCarPlayDestination',
-                      'UNNotificationDefaultDestinations',
-                      'UNNotificationLockScreenDestination',
-                      'UNNotificationNotificationCenterDestination',
-                      'UNNotificationTriggerType',
-                      'UNNotificationUserInfo'
-                      ]
+
+NotificationParams = [
+    'AppNotificationAttachments',
+    'AppNotificationBadgeNumber',
+    'AppNotificationContentAvailable',
+    'AppNotificationCreationDate',
+    'AppNotificationIdentifier',
+    'AppNotificationMessage',
+    'AppNotificationMessageLocalizationArguments',
+    'AppNotificationMessageLocazationKey',
+    'AppNotificationMutableContent',
+    'AppNotificationSummaryArgument',
+    'AppNotificationSummaryArgumentCount',
+    'AppNotificationTitle',
+    'BadgeApplicationIcon',
+    'CriticalAlertSound',
+    'HasDefaultActionKey',
+    'Header',
+    'SBSPushStoreNotificationCategoryKey',
+    'SBSPushStoreNotificationThreadKey',
+    'SchemaVersion',
+    'ShouldAuthenticateDefaultAction',
+    'ShouldBackgroundDefaultAction',
+    'ShouldHideDate',
+    'ShouldHideTime',
+    'ShouldIgnoreDoNotDisturb',
+    'ShouldIgnoreDowntime',
+    'ShouldPlaySound',
+    'ShouldPresentAlert',
+    'ShouldPreventNotificationDismissalAfterDefaultAction',
+    'ShouldSuppressScreenLightUp',
+    'ShouldSuppressSyncDismissalWhenRemoved',
+    'ShouldUseRequestIdentifierForDismissalSync',
+    'SoundMaximumDuration',
+    'SoundShouldIgnoreRingerSwitch',
+    'SoundShouldRepeat',
+    'ToneAlertType',
+    'ToneFileName',
+    'ToneMediaLibraryItemIdentifier',
+    'TriggerRepeatInterval',
+    'TriggerRepeats',
+    'TriggerTimeInterval',
+    'UNNotificationAlertDestination',
+    'UNNotificationCarPlayDestination',
+    'UNNotificationDefaultDestinations',
+    'UNNotificationLockScreenDestination',
+    'UNNotificationNotificationCenterDestination',
+    'UNNotificationTriggerType',
+    'UNNotificationUserInfo',
+]

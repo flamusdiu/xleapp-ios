@@ -6,14 +6,14 @@ from html_report.artifact_report import ArtifactHtmlReport
 from helpers import timeline, tsv
 from helpers.db import open_sqlite_db_readonly
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class BluetoothOther(ab.AbstractArtifact):
+class BluetoothOther(ab.Artifact):
     _name = 'Bluetooth Other'
     _search_dirs = '**/com.apple.MobileBluetooth.ledevices.other.db'
     _category = 'Bluetooth'
-    _web_icon = Icon.BLUETOOTH
+    _web_icon = WebIcon.BLUETOOTH
 
     def __init__(self):
         super().__init__(self)
@@ -59,11 +59,11 @@ class BluetoothOther(ab.AbstractArtifact):
         db.close()
 
 
-class BluetoothPaired(ab.AbstractArtifact):
+class BluetoothPaired(ab.Artifact):
     _name = 'Bluetooth Paired LE'
     _search_dirs = '**/com.apple.MobileBluetooth.ledevices.paired.db'
     _category = 'Bluetooth'
-    _web_icon = Icon.BLUETOOTH
+    _web_icon = WebIcon.BLUETOOTH
 
     def __init__(self):
         super().__init__(self)
@@ -119,11 +119,11 @@ class BluetoothPaired(ab.AbstractArtifact):
         db.close()
 
 
-class BluetoothPairedReg(ab.AbstractArtifact):
+class BluetoothPairedReg(ab.Artifact):
     _name = 'Bluetooth Paired'
     _search_dirs = '**/com.apple.MobileBluetooth.devices.plist'
     _category = 'Bluetooth'
-    _web_icon = Icon.BLUETOOTH
+    _web_icon = WebIcon.BLUETOOTH
 
     def __init__(self):
         super().__init__(self)

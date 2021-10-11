@@ -3,14 +3,14 @@ import re
 from datetime import datetime
 
 from html_report.artifact_report import ArtifactHtmlReport
-from helpers import is_platform_windows,  tsv
+from helpers import is_platform_windows, tsv
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class MobileContainerManger(ab.AbstractArtifact):
+class MobileContainerManger(ab.Artifact):
     _name = 'Mobile Container Manager'
-    _search_dirs = ('**/containermanagerd.log.*')
+    _search_dirs = '**/containermanagerd.log.*'
     _category = 'Mobile Container Manager'
 
     def get(self, files_found, seeker):
@@ -27,7 +27,10 @@ class MobileContainerManger(ab.AbstractArtifact):
                 for line in data:
                     linecount += 1
 
-                    if '[MCMGroupManager _removeGroupContainersIfNeededforUser:groupContainerClass:identifiers:referenceCounts:]: Last reference to group container' in line:
+                    if (
+                        '[MCMGroupManager _removeGroupContainersIfNeededforUser:groupContainerClass:identifiers:referenceCounts:]: Last reference to group container'
+                        in line
+                    ):
                         hitcount += 1
                         txts = line.split()
                         dayofweek = txts[0]
@@ -39,11 +42,12 @@ class MobileContainerManger(ab.AbstractArtifact):
 
                         datetime_object = datetime.strptime(month, "%b")
                         month_number = datetime_object.month
-                        concat_date = year + "-" + str(month_number) + "-" + day + " " + time
+                        concat_date = (
+                            year + "-" + str(month_number) + "-" + day + " " + time
+                        )
                         dtime_obj = datetime.strptime(concat_date, '%Y-%m-%d %H:%M:%S')
 
                         data_list.append((str(dtime_obj), group, str(linecount)))
-
 
         report = ArtifactHtmlReport('Mobile Container Manager')
         report.start_artifact_report(report_folder, 'Mobile Container Manager')

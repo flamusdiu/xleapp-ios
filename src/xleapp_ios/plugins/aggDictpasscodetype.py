@@ -1,22 +1,20 @@
 from dataclasses import dataclass
 
-from xleapp.artifacts.abstract import AbstractArtifact
-from xleapp.helpers.decorators import Search, long_running_process, timed
-from xleapp.report.webicons import Icon
+from xleapp import Artifact, WebIcon, Search, timed
 
 
 @dataclass
-class AggDictPasscodeType(AbstractArtifact):
+class AggDictPasscodeType(Artifact):
     def __post_init__(self):
-        self.name = 'Aggregate Dictionary Passcode Type'
-        self.category = 'Aggregate Dictionary'
-        self.web_icon = Icon.BOOK
+        self.name = "Aggregate Dictionary Passcode Type"
+        self.category = "Aggregate Dictionary"
+        self.web_icon = WebIcon.BOOK
 
     @timed
-    @Search('*/AggregateDictionary/ADDataStore.sqlitedb')
+    @Search("*/AggregateDictionary/ADDataStore.sqlitedb")
     def process(self):
         for fp in self.found:
-            cursor = fp.cursor()
+            cursor = fp().cursor()
 
             cursor.execute(
                 """

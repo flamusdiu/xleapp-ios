@@ -6,10 +6,10 @@ import sqlite3
 from html_report.artifact_report import ArtifactHtmlReport
 from helpers import is_platform_windows, open_sqlite_db_readonly, timeline, tsv
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class TileAppDisc(ab.AbstractArtifact):
+class TileAppDisc(ab.Artifact):
     _name = 'Tile App Discovered Tiles'
     _search_dirs = '*/private/var/mobile/Containers/Shared/AppGroup/*/com.thetxleapp.tile-DiscoveredTileDB.sqlite*'
     _category = 'Accounts'

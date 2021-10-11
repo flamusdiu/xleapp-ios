@@ -1,17 +1,15 @@
 from dataclasses import dataclass
 
 import xleapp.helpers.strings as strings
-from xleapp.artifacts.abstract import AbstractArtifact
-from xleapp.helpers.decorators import Search, timed
-from xleapp.report.webicons import Icon
+from xleapp import Artifact, WebIcon, Search, timed
 
 
 @dataclass
-class GeodPDPlaceCache(AbstractArtifact):
+class GeodPDPlaceCache(Artifact):
     def __post_init__(self):
-        self.name = 'PD Place Cache'
-        self.category = 'Geolocation'
-        self.web_icon = Icon.MAP_PIN
+        self.name = "PD Place Cache"
+        self.category = "Geolocation"
+        self.web_icon = WebIcon.MAP_PIN
         self.report_headers = (
             "last access time",
             "requestkey",
@@ -21,10 +19,10 @@ class GeodPDPlaceCache(AbstractArtifact):
         )
 
     @timed
-    @Search('**/com.apple.geod/PDPlaceCache.db')
+    @Search("**/com.apple.geod/PDPlaceCache.db")
     def process(self):
         for fp in self.found:
-            cursor = fp.cursor()
+            cursor = fp().cursor()
             cursor.execute(
                 """
                 SELECT requestkey, pdplacelookup.pdplacehash, datetime('2001-01-01', "lastaccesstime" || ' seconds') as lastaccesstime, datetime('2001-01-01', "expiretime" || ' seconds') as expiretime, pdplace
@@ -39,8 +37,8 @@ class GeodPDPlaceCache(AbstractArtifact):
             if usageentries > 0:
                 data_list = []
                 for row in all_rows:
-                    pd_place = ''.join(
-                        f'{row}<br>' for row in set(strings.print(row[4]))
+                    pd_place = "".join(
+                        f"{row}<br>" for row in set(strings.print(row[4]))
                     )
                     data_list.append((row[2], row[0], row[1], row[3], pd_place))
                 self.data = data_list

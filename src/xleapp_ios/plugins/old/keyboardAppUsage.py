@@ -3,13 +3,13 @@ import plistlib
 from html_report.artifact_report import ArtifactHtmlReport
 from helpers import timeline, tsv
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class KeyboardAppUsage (ab.AbstractArtifact):
+class KeyboardAppUsage(ab.Artifact):
 
     _name = 'Keyboard Application Usage'
-    _search_dirs = ('*/private/var/mobile/Library/Keyboard/app_usage_database.plist')
+    _search_dirs = '*/private/var/mobile/Library/Keyboard/app_usage_database.plist'
     _category = 'Keyboard Application Usage'
 
     def get(self, files_found, seeker):
@@ -21,13 +21,25 @@ class KeyboardAppUsage (ab.AbstractArtifact):
                 plist_content = plistlib.load(plist_file)
                 for app in plist_content:
                     for entry in plist_content[app]:
-                        data_list.append((entry['startDate'], app, entry['appTime'], ', '.join(map(str, entry['keyboardTimes']))))
+                        data_list.append(
+                            (
+                                entry['startDate'],
+                                app,
+                                entry['appTime'],
+                                ', '.join(map(str, entry['keyboardTimes'])),
+                            )
+                        )
 
         if len(data_list) > 0:
             report = ArtifactHtmlReport('Keyboard Application Usage')
             report.start_artifact_report(report_folder, 'Keyboard Application Usage')
             report.add_script()
-            data_headers = ('Date', 'Application Name', 'Application Time Used in Seconds', 'Keyboard Times Used in Seconds')
+            data_headers = (
+                'Date',
+                'Application Name',
+                'Application Time Used in Seconds',
+                'Keyboard Times Used in Seconds',
+            )
             report.write_artifact_data_table(data_headers, data_list, file_found)
             report.end_artifact_report()
 

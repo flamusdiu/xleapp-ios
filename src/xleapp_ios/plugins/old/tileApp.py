@@ -8,10 +8,10 @@ from helpers import is_platform_windows, kmlgen, timeline, tsv
 
 import artifacts.artGlobals
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class TileApp(ab.AbstractArtifact):
+class TileApp(ab.Artifact):
     _name = 'Tile App Geolocation Logs'
     _search_dirs = '*private/var/mobile/Containers/Data/Application/*/Library/log/com.thetxleapp.tile*'
     _category = 'Locations'

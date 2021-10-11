@@ -1,23 +1,21 @@
 from dataclasses import dataclass
 
-from xleapp.artifacts.abstract import AbstractArtifact
-from xleapp.helpers.decorators import Search, timed
-from xleapp.report.webicons import Icon
+from xleapp import Artifact, WebIcon, Search, timed
 
 
 @dataclass
-class GeodApplication(AbstractArtifact):
+class GeodApplication(Artifact):
     def __post_init__(self):
-        self.name = 'GeoD Application'
-        self.category = 'Applications'
-        self.web_icon = Icon.GRID
+        self.name = "GeoD Application"
+        self.category = "Applications"
+        self.web_icon = WebIcon.GRID
         self.report_headers = ("Creation Time", "Count ID", "Application")
 
     @timed
-    @Search('**/com.apple.geod/AP.db')
+    @Search("**/com.apple.geod/AP.db")
     def process(self):
         for fp in self.found:
-            cursor = fp.cursor()
+            cursor = fp().cursor()
             cursor.execute(
                 """
                 SELECT count_type, app_id, createtime

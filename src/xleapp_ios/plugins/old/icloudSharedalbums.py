@@ -3,15 +3,15 @@ import plistlib
 from pathlib import Path
 
 from html_report.artifact_report import ArtifactHtmlReport
-from helpers import is_platform_windows,   tsv
+from helpers import is_platform_windows, tsv
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class ICloudSharedAlbums(ab.AbstractArtifact):
+class ICloudSharedAlbums(ab.Artifact):
 
     _name = 'iCloud Shared Owner Info'
-    _search_dirs = ('*/private/var/mobile/Media/PhotoData/PhotoCloudSharingData/*')
+    _search_dirs = '*/private/var/mobile/Media/PhotoData/PhotoCloudSharingData/*'
     _category = 'iCloud Shared Albums'
 
     def get(self, files_found, seeker):
@@ -54,10 +54,12 @@ class ICloudSharedAlbums(ab.AbstractArtifact):
                                     lastname = b
 
                             file_found_persons = file_found
-                            data_list_sharedpersoninfos.append((email, firstname, lastname, fullname, x))
+                            data_list_sharedpersoninfos.append(
+                                (email, firstname, lastname, fullname, x)
+                            )
 
                 elif pathedtail == 'Info.plist':
-                    albumid = (os.path.basename(os.path.dirname(file_found)))
+                    albumid = os.path.basename(os.path.dirname(file_found))
                     albumpath = file_found
                     # print(f'Info.plist album ID: {albumid}')
 
@@ -68,10 +70,10 @@ class ICloudSharedAlbums(ab.AbstractArtifact):
 
                         cloudOwnerEmail = ''
                         cloudownerfirstname = ''
-                        cloudownerlastname  = ''
-                        cloudpublicurlenabled  = ''
+                        cloudownerlastname = ''
+                        cloudpublicurlenabled = ''
                         cloudsubscriptiondate = ''
-                        cloudrelationshipstate  = ''
+                        cloudrelationshipstate = ''
                         cloudownerhashedpersonid = ''
                         clowdoenweremail = ''
                         title = ''
@@ -95,10 +97,23 @@ class ICloudSharedAlbums(ab.AbstractArtifact):
                             if x == 'cloudOwnerHashedPersonID':
                                 cloudownerhashedpersonid = y
 
-                    data_list_sharedinfos.append((albumtitle, albumid, clowdoenweremail, cloudownerfirstname, cloudownerlastname, cloudpublicurlenabled, cloudsubscriptiondate, cloudrelationshipstate, cloudownerhashedpersonid, albumpath))
+                    data_list_sharedinfos.append(
+                        (
+                            albumtitle,
+                            albumid,
+                            clowdoenweremail,
+                            cloudownerfirstname,
+                            cloudownerlastname,
+                            cloudpublicurlenabled,
+                            cloudsubscriptiondate,
+                            cloudrelationshipstate,
+                            cloudownerhashedpersonid,
+                            albumpath,
+                        )
+                    )
 
                 elif pathedtail == 'DCIM_CLOUD.plist':
-                    albumid = (os.path.basename(os.path.dirname(file_found)))
+                    albumid = os.path.basename(os.path.dirname(file_found))
                     albumpath = file_found
                     # print(f'Info.plist album ID: {albumid}')
                     with open(file_found, "rb") as fp:
@@ -108,7 +123,9 @@ class ICloudSharedAlbums(ab.AbstractArtifact):
                                 dcimlastdictnum = y
                             if x == 'DCIMLastFileNumber':
                                 dcimlastfilenum = y
-                        data_list_cloudinfo.append((albumid, dcimlastdictnum, dcimlastfilenum, albumpath))
+                        data_list_cloudinfo.append(
+                            (albumid, dcimlastdictnum, dcimlastfilenum, albumpath)
+                        )
 
             else:
                 pass
@@ -118,8 +135,21 @@ class ICloudSharedAlbums(ab.AbstractArtifact):
             report = ArtifactHtmlReport('iCloud Shared Owner Info')
             report.start_artifact_report(report_folder, 'iCloud Shared Owner Info')
             report.add_script()
-            data_headers = ('Album Title','Album ID','Clowd Owner Email','Cloud Owner First Name','Clowd Owner Lastname','Cloud Public URL Enabled?','Cloud Subscription Date','Cloud Relationship State','Cloud Ownewr Hashed Person ID', 'File location' )
-            report.write_artifact_data_table(data_headers, data_list_sharedinfos, location)
+            data_headers = (
+                'Album Title',
+                'Album ID',
+                'Clowd Owner Email',
+                'Cloud Owner First Name',
+                'Clowd Owner Lastname',
+                'Cloud Public URL Enabled?',
+                'Cloud Subscription Date',
+                'Cloud Relationship State',
+                'Cloud Ownewr Hashed Person ID',
+                'File location',
+            )
+            report.write_artifact_data_table(
+                data_headers, data_list_sharedinfos, location
+            )
             report.end_artifact_report()
 
             tsvname = 'iCloud Shared Owner Info'
@@ -132,8 +162,15 @@ class ICloudSharedAlbums(ab.AbstractArtifact):
             report = ArtifactHtmlReport('iCloud Shared Album data')
             report.start_artifact_report(report_folder, 'iCloud Shared Album Data')
             report.add_script()
-            data_headers = ('Album Name', 'DCIM Last Directory Number','DCIM LAst File Number', 'File location' )
-            report.write_artifact_data_table(data_headers, data_list_cloudinfo, location)
+            data_headers = (
+                'Album Name',
+                'DCIM Last Directory Number',
+                'DCIM LAst File Number',
+                'File location',
+            )
+            report.write_artifact_data_table(
+                data_headers, data_list_cloudinfo, location
+            )
             report.end_artifact_report()
 
             tsvname = 'iCloud Shared Album Data'
@@ -146,8 +183,16 @@ class ICloudSharedAlbums(ab.AbstractArtifact):
             report = ArtifactHtmlReport('iCloud Shared Album Persons Info')
             report.start_artifact_report(report_folder, 'iCloud Shared Person Info')
             report.add_script()
-            data_headers = ('Email', 'Firstname','Lastname', 'Fullname', 'Identification' )
-            report.write_artifact_data_table(data_headers, data_list_sharedpersoninfos, location)
+            data_headers = (
+                'Email',
+                'Firstname',
+                'Lastname',
+                'Fullname',
+                'Identification',
+            )
+            report.write_artifact_data_table(
+                data_headers, data_list_sharedpersoninfos, location
+            )
             report.end_artifact_report()
 
             tsvname = 'iCloud Shared Person Info'
@@ -160,8 +205,10 @@ class ICloudSharedAlbums(ab.AbstractArtifact):
             report = ArtifactHtmlReport('iCloud Shared Albums Emails')
             report.start_artifact_report(report_folder, 'iCloud Shared Emails')
             report.add_script()
-            data_headers = ('Key', 'Value' )
-            report.write_artifact_data_table(data_headers, data_list_sharedemails, location)
+            data_headers = ('Key', 'Value')
+            report.write_artifact_data_table(
+                data_headers, data_list_sharedemails, location
+            )
             report.end_artifact_report()
 
             tsvname = 'iCloud Shared Albums Emails'

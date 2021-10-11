@@ -4,15 +4,15 @@ from helpers import tsv
 from xleapp.html_report import Icon
 from html_report.artifact_report import ArtifactHtmlReport
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class DHCPReceivedList(ab.AbstractArtifact):
+class DHCPReceivedList(ab.Artifact):
 
     _name = 'DHCP Received List'
     _search_dirs = '**/private/var/db/dhcpclient/leases/en*'
     _category = 'DHCP'
-    _web_icon = Icon.SETTINGS
+    _web_icon = WebIcon.SETTINGS
 
     def __init__(self):
         super().__init__(self)

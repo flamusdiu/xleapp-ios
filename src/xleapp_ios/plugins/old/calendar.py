@@ -3,15 +3,15 @@ from html_report.artifact_report import ArtifactHtmlReport
 from helpers import timeline, tsv
 from helpers.db import open_sqlite_db_readonly
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class Calendar(ab.AbstractArtifact):
+class Calendar(ab.Artifact):
 
     _name = 'Calendar List'
     _search_dirs = '**/Calendar.sqlitedb'
     _category = 'Calendar'
-    _web_icon = Icon.CALENDAR
+    _web_icon = WebIcon.CALENDAR
 
     def __init__(self):
         super().__init__(self)

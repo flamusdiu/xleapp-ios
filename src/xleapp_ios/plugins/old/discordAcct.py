@@ -3,15 +3,17 @@ import string
 from helpers import tsv
 from html_report.artifact_report import ArtifactHtmlReport
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class DiscordAcct(ab.AbstractArtifact):
+class DiscordAcct(ab.Artifact):
 
     _name = 'Discord Account'
-    _search_dirs = ('*/var/mobile/Containers/Data/Application/*/Documents/mmkv/mmkv.default')
+    _search_dirs = (
+        '*/var/mobile/Containers/Data/Application/*/Documents/mmkv/mmkv.default'
+    )
     _category = 'Discord'
-    _web_icon = Icon.USER
+    _web_icon = WebIcon.USER
 
     def __init__(self):
         super().__init__(self)
@@ -24,7 +26,9 @@ class DiscordAcct(ab.AbstractArtifact):
             for s in strings(file_found):
                 # print(type(s))
                 # print(s)
-                searchlist.append(str(s),)
+                searchlist.append(
+                    str(s),
+                )
 
             counter = 0
             data_list = []
@@ -56,6 +60,7 @@ class DiscordAcct(ab.AbstractArtifact):
 
             tsvname = 'Discord Account'
             tsv(report_folder, data_headers, data_list, tsvname)
+
 
 def strings(filename, min=4):
     with open(filename, errors="ignore") as f:  # Python 3.x

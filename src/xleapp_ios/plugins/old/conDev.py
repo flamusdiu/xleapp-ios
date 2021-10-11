@@ -2,15 +2,15 @@ from html_report.artifact_report import ArtifactHtmlReport
 from helpers import tsv
 from xleapp.html_report import Icon
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class ConDev(ab.AbstractArtifact):
+class ConDev(ab.Artifact):
 
     _name = 'Connected Devices'
     _search_dirs = '**/iTunes_Control/iTunes/iTunesPrefs'
     _category = 'Connected to'
-    _web_icon = Icon.ZAP
+    _web_icon = WebIcon.ZAP
 
     def __init__(self):
         super().__init__(self)

@@ -9,15 +9,15 @@ from helpers import timeline, tsv
 from xleapp.html_report import Icon
 from html_report.artifact_report import ArtifactHtmlReport
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class AppItunesMetadata(ab.AbstractArtifact):
+class AppItunesMetadata(ab.Artifact):
 
     _name = "App iTunes Metadata"
     _search_dirs = ('**/iTunesMetadata.plist', '**/BundleMetadata.plist')
     _category = 'Installed Apps'
-    _web_icon = Icon.PACKAGE
+    _web_icon = WebIcon.PACKAGE
 
     def __init__(self):
         super().__init__(self)

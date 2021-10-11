@@ -1,19 +1,20 @@
 from html_report.artifact_report import ArtifactHtmlReport
 from helpers import open_sqlite_db_readonly, timeline, tsv
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class QueryPredictions(ab.AbstractArtifact):
+class QueryPredictions(ab.Artifact):
     _name = 'Query Predictions'
-    _search_dirs = ('**/query_predictions.db')
+    _search_dirs = '**/query_predictions.db'
     _category = 'SMS & iMessage'
 
     def get(self, files_found, seeker):
         file_found = str(files_found[0])
         db = open_sqlite_db_readonly(file_found)
         cursor = db.cursor()
-        cursor.execute("""
+        cursor.execute(
+            """
         select
         datetime(creationTimestamp, "UNIXEPOCH") as START,
         content,
@@ -22,7 +23,8 @@ class QueryPredictions(ab.AbstractArtifact):
         id,
         uuid
         from messages
-        """)
+        """
+        )
         all_rows = cursor.fetchall()
         usageentries = len(all_rows)
         if usageentries > 0:
@@ -33,7 +35,14 @@ class QueryPredictions(ab.AbstractArtifact):
             report = ArtifactHtmlReport('Query Predictions')
             report.start_artifact_report(report_folder, 'Query Predictions')
             report.add_script()
-            data_headers = ('Timestamp', 'Content', 'Is Sent?', 'Conversation ID', 'ID', 'UUID')
+            data_headers = (
+                'Timestamp',
+                'Content',
+                'Is Sent?',
+                'Conversation ID',
+                'ID',
+                'UUID',
+            )
             report.write_artifact_data_table(data_headers, data_list, file_found)
             report.end_artifact_report()
 

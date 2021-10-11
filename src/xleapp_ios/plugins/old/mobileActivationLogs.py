@@ -4,14 +4,14 @@ import re
 from datetime import datetime
 
 from html_report.artifact_report import ArtifactHtmlReport
-from helpers import is_platform_windows,   tsv
+from helpers import is_platform_windows, tsv
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class MobileActivationLogs(ab.AbstractArtifact):
+class MobileActivationLogs(ab.Artifact):
     _name = 'Mobile Activation Logs'
-    _search_dirs = ('**/mobileactivationd.log*')
+    _search_dirs = '**/mobileactivationd.log*'
     _category = 'Mobile Activation Logs'
 
     def get(self, files_found, seeker):
@@ -36,11 +36,13 @@ class MobileActivationLogs(ab.AbstractArtifact):
 
                 for line in data:
                     linecount += 1
-                    date_filter = re.compile(r'(([A-Za-z]+[\s]+([a-zA-Z]+[\s]+[0-9]+)[\s]+([0-9]+\:[0-9]+\:[0-9]+)[\s]+([0-9]{4}))([\s]+[\[\d\]]+[\s]+[\<a-z\>]+[\s]+[\(\w\)]+[\s]+[A-Z]{2}\:[\s]+)([main\:\s]*.*)$)')
+                    date_filter = re.compile(
+                        r'(([A-Za-z]+[\s]+([a-zA-Z]+[\s]+[0-9]+)[\s]+([0-9]+\:[0-9]+\:[0-9]+)[\s]+([0-9]{4}))([\s]+[\[\d\]]+[\s]+[\<a-z\>]+[\s]+[\(\w\)]+[\s]+[A-Z]{2}\:[\s]+)([main\:\s]*.*)$)'
+                    )
                     line_match = re.match(date_filter, line)
 
                     if line_match:
-                        date_time = (line_match.group(3, 5, 4))
+                        date_time = line_match.group(3, 5, 4)
                         conv_time = ' '.join(date_time)
                         dtime_obj = datetime.strptime(conv_time, '%b %d %Y %H:%M:%S')
                         ma_datetime = str(dtime_obj)
@@ -48,19 +50,29 @@ class MobileActivationLogs(ab.AbstractArtifact):
 
                         if 'perform_data_migration' in values:
                             hitcount += 1
-                            upgrade_match = re.search((r'((.*)(Upgrade\s+from\s+[\w]+\s+to\s+[\w]+\s+detected\.$))'), values)
+                            upgrade_match = re.search(
+                                (
+                                    r'((.*)(Upgrade\s+from\s+[\w]+\s+to\s+[\w]+\s+detected\.$))'
+                                ),
+                                values,
+                            )
                             if upgrade_match:
                                 upgrade = upgrade_match.group(3)
                                 data_list.append((ma_datetime, upgrade, file_name))
 
-                        if '____________________ Mobile Activation Startup _____________________' in values:
+                        if (
+                            '____________________ Mobile Activation Startup _____________________'
+                            in values
+                        ):
                             activationcount += 1
                             ma_startup_line = str(linecount)
-                            ma_startup = (f'Mobile Activation Startup at line: {ma_startup_line}')
+                            ma_startup = (
+                                f'Mobile Activation Startup at line: {ma_startup_line}'
+                            )
                             data_list.append((ma_datetime, ma_startup, file_name))
 
-                    upgrade_entries = (f'Found {hitcount} Upgrade entries in {file_name}')
-                    boot_entries = (f'Found {activationcount} Mobile Activation entries in {file_name}')
+                    upgrade_entries = f'Found {hitcount} Upgrade entries in {file_name}'
+                    boot_entries = f'Found {activationcount} Mobile Activation entries in {file_name}'
                 data_list_info.append((boot_entries, upgrade_entries))
 
         report = ArtifactHtmlReport('Mobile Activation Logs')
@@ -71,8 +83,15 @@ class MobileActivationLogs(ab.AbstractArtifact):
 
         source_files_found = ', '.join(source_files)
 
-        report.write_artifact_data_table(data_headers_info, data_list_info, source_files_found, cols_repeated_at_bottom=False)
-        report.write_artifact_data_table(data_headers, data_list, source_files_found, True, False)
+        report.write_artifact_data_table(
+            data_headers_info,
+            data_list_info,
+            source_files_found,
+            cols_repeated_at_bottom=False,
+        )
+        report.write_artifact_data_table(
+            data_headers, data_list, source_files_found, True, False
+        )
         report.end_artifact_report()
 
         tsvname = 'Mobile Activation Logs'

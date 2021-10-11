@@ -5,15 +5,15 @@ from html_report.artifact_report import ArtifactHtmlReport
 from helpers import tsv
 from xleapp.html_report import Icon
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class CellularWireless(ab.AbstractArtifact):
+class CellularWireless(ab.Artifact):
 
     _name = 'Cellular Wireless'
     _search_dirs = '*wireless/Library/Preferences/com.apple.*'
     _category = 'Cellular Wireless'
-    _web_icon = Icon.BAR_CHART
+    _web_icon = WebIcon.BAR_CHART
 
     def __init__(self):
         super().__init__(self)

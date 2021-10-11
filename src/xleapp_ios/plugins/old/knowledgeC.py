@@ -9,30 +9,32 @@ import textwrap
 from html_report.artifact_report import ArtifactHtmlReport
 from packaging import version
 from tools.ccl import ccl_bplist
-from helpers import(is_platform_windows, kmlgen,
-                             open_sqlite_db_readonly, timeline, tsv)
+from helpers import is_platform_windows, kmlgen, open_sqlite_db_readonly, timeline, tsv
 from tools.parse3 import ParseProto
 
 import artifacts.artGlobals
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class KnowledgeC(ab.AbstractArtifact):
+class KnowledgeC(ab.Artifact):
 
     _name = 'KnowledgeC'
-    _search_dirs = ('**/CoreDuet/Knowledge/knowledgeC.db')
+    _search_dirs = '**/CoreDuet/Knowledge/knowledgeC.db'
     _category = 'KnowledgeC'
 
     def get(self, files_found, seeker):
         iOSversion = artifacts.artGlobals.versionf
         if version.parse(iOSversion) < version.parse("12"):
-            logfunc("Unsupported version for KnowledgC Inferred Motion on iOS " + iOSversion)
+            logfunc(
+                "Unsupported version for KnowledgC Inferred Motion on iOS " + iOSversion
+            )
         else:
             file_found = str(files_found[0])
             db = open_sqlite_db_readonly(file_found)
             cursor = db.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zobject.zstartdate+978307200,'unixepoch'),
             datetime(zobject.zenddate+978307200,'unixepoch'),
@@ -54,20 +56,34 @@ class KnowledgeC(ab.AbstractArtifact):
             zobject
             where
             zstreamname = '/inferred/motion'
-            """)
+            """
+            )
 
             all_rows = cursor.fetchall()
             usageentries = len(all_rows)
             if usageentries > 0:
                 data_list = []
                 for row in all_rows:
-                    data_list.append((row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7]))
+                    data_list.append(
+                        (row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7])
+                    )
 
                 description = ''
                 report = ArtifactHtmlReport('KnowledgeC Inferred Motion')
-                report.start_artifact_report(report_folder, 'Inferred Motion', description)
+                report.start_artifact_report(
+                    report_folder, 'Inferred Motion', description
+                )
                 report.add_script()
-                data_headers = ('Start','End','GMT Offset','Value','Usage in Seconds','Usage in Minutes','Day of Week','Entry Creation')
+                data_headers = (
+                    'Start',
+                    'End',
+                    'GMT Offset',
+                    'Value',
+                    'Usage in Seconds',
+                    'Usage in Minutes',
+                    'Day of Week',
+                    'Entry Creation',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -80,7 +96,8 @@ class KnowledgeC(ab.AbstractArtifact):
                 logfunc('No data available in Inferred Motion')
 
         cursor = db.cursor()
-        cursor.execute("""
+        cursor.execute(
+            """
             select
             datetime(zobject.zcreationdate+978307200,'unixepoch'),
             case zobject.zstartdayofweek
@@ -106,19 +123,46 @@ class KnowledgeC(ab.AbstractArtifact):
             and zobject.zsource = zsource.z_pk
             and zstreamname = '/app/activity'
             order by 'entry creation'
-        """)
+        """
+        )
 
         all_rows = cursor.fetchall()
         usageentries = len(all_rows)
         data_list = []
         for row in all_rows:
-            data_list.append((row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10]))
+            data_list.append(
+                (
+                    row[0],
+                    row[1],
+                    row[2],
+                    row[3],
+                    row[4],
+                    row[5],
+                    row[6],
+                    row[7],
+                    row[8],
+                    row[9],
+                    row[10],
+                )
+            )
 
         description = ''
         report = ArtifactHtmlReport('KnowledgeC App Activity')
         report.start_artifact_report(report_folder, 'App Activity', description)
         report.add_script()
-        data_headers = ('Entry Creation','Day of the Week','Start','End','Value String', 'Activity Type', 'Title', 'Expiration Date', 'Content URL', 'Calendar Date', 'Calendar End Date' )
+        data_headers = (
+            'Entry Creation',
+            'Day of the Week',
+            'Start',
+            'End',
+            'Value String',
+            'Activity Type',
+            'Title',
+            'Expiration Date',
+            'Content URL',
+            'Calendar Date',
+            'Calendar End Date',
+        )
         report.write_artifact_data_table(data_headers, data_list, file_found)
         report.end_artifact_report()
 
@@ -130,7 +174,8 @@ class KnowledgeC(ab.AbstractArtifact):
 
         if version.parse(iOSversion) >= version.parse("12"):
             cursor = db.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zobject.zstartdate+978307200,'unixepoch'),
             datetime(zobject.zenddate+978307200,'unixepoch'),
@@ -161,10 +206,12 @@ class KnowledgeC(ab.AbstractArtifact):
             where zobject.zstructuredmetadata = zstructuredmetadata.z_pk
             and zobject.zsource = zsource.z_pk
             and zstreamname = '/app/activity'
-            """)
+            """
+            )
         else:
             cursor = db.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zobject.zstartdate+978307200,'unixepoch'),
             datetime(zobject.zenddate+978307200,'unixepoch'),
@@ -188,7 +235,8 @@ class KnowledgeC(ab.AbstractArtifact):
             where zobject.zstructuredmetadata = zstructuredmetadata.z_pk
             and zobject.zsource = zsource.z_pk
             and zstreamname = '/app/activity'
-            """)
+            """
+            )
 
             all_rows = cursor.fetchall()
             usageentries = len(all_rows)
@@ -196,13 +244,54 @@ class KnowledgeC(ab.AbstractArtifact):
                 data_list = []
 
                 if version.parse(iOSversion) >= version.parse("12"):
-                    for row in all_rows:    data_list.append((row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],row[11],row[12],row[13],row[14],row[15],row[16]))
+                    for row in all_rows:
+                        data_list.append(
+                            (
+                                row[0],
+                                row[1],
+                                row[2],
+                                row[3],
+                                row[4],
+                                row[5],
+                                row[6],
+                                row[7],
+                                row[8],
+                                row[9],
+                                row[10],
+                                row[11],
+                                row[12],
+                                row[13],
+                                row[14],
+                                row[15],
+                                row[16],
+                            )
+                        )
 
                     report = ArtifactHtmlReport('KnowledgeC Application Activity')
                     report.start_artifact_report(report_folder, 'Application Activity')
                     report.add_script()
-                    data_headers = ('Start','End','Bundle ID','Group ID','Activity Type', 'Content Description', 'User Activity Required String', 'Content URL','Suggest Invocation Phrase','Unique ID','Source ID','ID','Activity UUID','Day of Week','GMT Offset','Entry Creation','Expiration Date' )
-                    report.write_artifact_data_table(data_headers, data_list, file_found)
+                    data_headers = (
+                        'Start',
+                        'End',
+                        'Bundle ID',
+                        'Group ID',
+                        'Activity Type',
+                        'Content Description',
+                        'User Activity Required String',
+                        'Content URL',
+                        'Suggest Invocation Phrase',
+                        'Unique ID',
+                        'Source ID',
+                        'ID',
+                        'Activity UUID',
+                        'Day of Week',
+                        'GMT Offset',
+                        'Entry Creation',
+                        'Expiration Date',
+                    )
+                    report.write_artifact_data_table(
+                        data_headers, data_list, file_found
+                    )
                     report.end_artifact_report()
 
                     tsvname = 'KnowledgeC Application Activity'
@@ -212,12 +301,38 @@ class KnowledgeC(ab.AbstractArtifact):
                     timeline(report_folder, tlactivity, data_list, data_headers)
                 else:
                     for row in all_rows:
-                        data_list.append((row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9]))
+                        data_list.append(
+                            (
+                                row[0],
+                                row[1],
+                                row[2],
+                                row[3],
+                                row[4],
+                                row[5],
+                                row[6],
+                                row[7],
+                                row[8],
+                                row[9],
+                            )
+                        )
                     report = ArtifactHtmlReport('KnowledgeC Application Activity')
                     report.start_artifact_report(report_folder, 'Application Activity')
                     report.add_script()
-                    data_headers = ('Start','End','Bundle ID','Activity Type', 'Title','Content URL','Day of Week','GMT Offset','Entry Creation','Expiration Date')
-                    report.write_artifact_data_table(data_headers, data_list, file_found)
+                    data_headers = (
+                        'Start',
+                        'End',
+                        'Bundle ID',
+                        'Activity Type',
+                        'Title',
+                        'Content URL',
+                        'Day of Week',
+                        'GMT Offset',
+                        'Entry Creation',
+                        'Expiration Date',
+                    )
+                    report.write_artifact_data_table(
+                        data_headers, data_list, file_found
+                    )
                     report.end_artifact_report()
 
                     tsvname = 'KnowledgeC Application Activity'
@@ -228,10 +343,10 @@ class KnowledgeC(ab.AbstractArtifact):
             else:
                 logfunc('No data available in Application Activity')
 
-
         if version.parse(iOSversion) >= version.parse("12"):
             cursor = db.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zobject.zstartdate+978307200,'unixepoch'),
             datetime(zobject.zenddate+978307200,'unixepoch'),
@@ -265,10 +380,12 @@ class KnowledgeC(ab.AbstractArtifact):
             where
             zstreamname = "/app/activity"
             and (zvaluestring = "com.apple.mobilecal" or zvaluestring = "com.apple.ical")
-            """)
+            """
+            )
         else:
             cursor = db.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zobject.zstartdate+978307200,'unixepoch'),
             datetime(zobject.zenddate+978307200,'unixepoch'),
@@ -296,7 +413,8 @@ class KnowledgeC(ab.AbstractArtifact):
             and zobject.zsource = zsource.z_pk
             and zstreamname = '/app/activity'
             and (zvaluestring = 'com.apple.mobilecal' or zvaluestring = 'com.apple.ical')
-                        """)
+                        """
+            )
 
         all_rows = cursor.fetchall()
         usageentries = len(all_rows)
@@ -305,12 +423,47 @@ class KnowledgeC(ab.AbstractArtifact):
 
             if version.parse(iOSversion) >= version.parse("12"):
 
-                for row in all_rows:    data_list.append((row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],row[11],row[12]))
+                for row in all_rows:
+                    data_list.append(
+                        (
+                            row[0],
+                            row[1],
+                            row[2],
+                            row[3],
+                            row[4],
+                            row[5],
+                            row[6],
+                            row[7],
+                            row[8],
+                            row[9],
+                            row[10],
+                            row[11],
+                            row[12],
+                        )
+                    )
 
-                report = ArtifactHtmlReport('InteractionC Application Activity Calendar')
-                report.start_artifact_report(report_folder, 'Application Activity Calendar')
+                report = ArtifactHtmlReport(
+                    'InteractionC Application Activity Calendar'
+                )
+                report.start_artifact_report(
+                    report_folder, 'Application Activity Calendar'
+                )
                 report.add_script()
-                data_headers = ('Start','End','Bundle ID','Activity Type','User Activity Required String','Title','Calendar Date','Calendar End Date','Source ID','Day of Week','GMT Offset','Entry Creation','Expiration Date')
+                data_headers = (
+                    'Start',
+                    'End',
+                    'Bundle ID',
+                    'Activity Type',
+                    'User Activity Required String',
+                    'Title',
+                    'Calendar Date',
+                    'Calendar End Date',
+                    'Source ID',
+                    'Day of Week',
+                    'GMT Offset',
+                    'Entry Creation',
+                    'Expiration Date',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -321,12 +474,40 @@ class KnowledgeC(ab.AbstractArtifact):
                 timeline(report_folder, tlactivity, data_list, data_headers)
             else:
                 for row in all_rows:
-                    data_list.append((row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10]))
+                    data_list.append(
+                        (
+                            row[0],
+                            row[1],
+                            row[2],
+                            row[3],
+                            row[4],
+                            row[5],
+                            row[6],
+                            row[7],
+                            row[8],
+                            row[9],
+                            row[10],
+                        )
+                    )
 
                 report = ArtifactHtmlReport('InteractionC Application Activty Calendar')
-                report.start_artifact_report(report_folder, 'Application Activity Calendar')
+                report.start_artifact_report(
+                    report_folder, 'Application Activity Calendar'
+                )
                 report.add_script()
-                data_headers = ('Start','End','Bundle ID','Activity Type', 'Title','Expiration Date','Calendar Date','Calendar End Date','Day of Week','GMT Offset','Entry Creation' )
+                data_headers = (
+                    'Start',
+                    'End',
+                    'Bundle ID',
+                    'Activity Type',
+                    'Title',
+                    'Expiration Date',
+                    'Calendar Date',
+                    'Calendar End Date',
+                    'Day of Week',
+                    'GMT Offset',
+                    'Entry Creation',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -340,7 +521,8 @@ class KnowledgeC(ab.AbstractArtifact):
 
         if version.parse(iOSversion) >= version.parse("12"):
             cursor = db.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zobject.zstartdate+978307200,'unixepoch'),
             datetime(zobject.zenddate+978307200,'unixepoch'),
@@ -370,10 +552,12 @@ class KnowledgeC(ab.AbstractArtifact):
             and zobject.zsource = zsource.z_pk
             and zstreamname = '/app/activity'
             and (zobject.zvaluestring = 'com.apple.mobilesafari' or zobject.zvaluestring = 'com.apple.safari')
-                """)
+                """
+            )
         else:
             cursor = db.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zobject.zstartdate+978307200,'unixepoch'),
             datetime(zobject.zenddate+978307200,'unixepoch'),
@@ -400,7 +584,8 @@ class KnowledgeC(ab.AbstractArtifact):
             and zobject.zsource = zsource.z_pk
             and zstreamname = '/app/activity'
             and (zobject.zvaluestring = 'com.apple.mobilesafari' or zobject.zvaluestring = 'com.apple.safari')
-            """)
+            """
+            )
 
         all_rows = cursor.fetchall()
         usageentries = len(all_rows)
@@ -409,12 +594,49 @@ class KnowledgeC(ab.AbstractArtifact):
 
             if version.parse(iOSversion) >= version.parse("12"):
 
-                for row in all_rows:    data_list.append((row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],row[11],row[12],row[13],row[14]))
+                for row in all_rows:
+                    data_list.append(
+                        (
+                            row[0],
+                            row[1],
+                            row[2],
+                            row[3],
+                            row[4],
+                            row[5],
+                            row[6],
+                            row[7],
+                            row[8],
+                            row[9],
+                            row[10],
+                            row[11],
+                            row[12],
+                            row[13],
+                            row[14],
+                        )
+                    )
 
                 report = ArtifactHtmlReport('KnowledgeC Application Activity Safari')
-                report.start_artifact_report(report_folder, 'Application Activity Safari')
+                report.start_artifact_report(
+                    report_folder, 'Application Activity Safari'
+                )
                 report.add_script()
-                data_headers = ('Start','End','Bundle ID','Activity Type', 'Content Description', 'Content URL','User Activity Required String','ID','Unique ID','Activity UUID','Source ID','Day of Week','GMT Offset','Entry Creation','Expiration Date')
+                data_headers = (
+                    'Start',
+                    'End',
+                    'Bundle ID',
+                    'Activity Type',
+                    'Content Description',
+                    'Content URL',
+                    'User Activity Required String',
+                    'ID',
+                    'Unique ID',
+                    'Activity UUID',
+                    'Source ID',
+                    'Day of Week',
+                    'GMT Offset',
+                    'Entry Creation',
+                    'Expiration Date',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -425,12 +647,42 @@ class KnowledgeC(ab.AbstractArtifact):
                 timeline(report_folder, tlactivity, data_list, data_headers)
             else:
                 for row in all_rows:
-                    data_list.append((row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],row[11]))
+                    data_list.append(
+                        (
+                            row[0],
+                            row[1],
+                            row[2],
+                            row[3],
+                            row[4],
+                            row[5],
+                            row[6],
+                            row[7],
+                            row[8],
+                            row[9],
+                            row[10],
+                            row[11],
+                        )
+                    )
 
                 report = ArtifactHtmlReport('KnowledgeC Application Activty Safari')
-                report.start_artifact_report(report_folder, 'Application Activity Safari')
+                report.start_artifact_report(
+                    report_folder, 'Application Activity Safari'
+                )
                 report.add_script()
-                data_headers = ('Start','End','Bundle ID','Activity Type','Content URL','ID','Unique ID','Source ID','Day of Week','GMT Offset','Entry Creation','Expiration Date')
+                data_headers = (
+                    'Start',
+                    'End',
+                    'Bundle ID',
+                    'Activity Type',
+                    'Content URL',
+                    'ID',
+                    'Unique ID',
+                    'Source ID',
+                    'Day of Week',
+                    'GMT Offset',
+                    'Entry Creation',
+                    'Expiration Date',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -444,7 +696,8 @@ class KnowledgeC(ab.AbstractArtifact):
 
         if version.parse(iOSversion) >= version.parse("12"):
             cursor = db.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zobject.zstartdate+978307200,'unixepoch'),
             datetime(zobject.zenddate+978307200,'unixepoch'),
@@ -462,7 +715,8 @@ class KnowledgeC(ab.AbstractArtifact):
             datetime(zobject.zcreationdate+978307200,'unixepoch')
             from zobject
             where zstreamname = '/app/relevantShortcuts'
-            """)
+            """
+            )
 
             all_rows = cursor.fetchall()
             usageentries = len(all_rows)
@@ -473,9 +727,18 @@ class KnowledgeC(ab.AbstractArtifact):
 
                 description = ''
                 report = ArtifactHtmlReport('KnowledgeC Application Relevant Shortcuts')
-                report.start_artifact_report(report_folder, 'App Relevant Shortcuts', description)
+                report.start_artifact_report(
+                    report_folder, 'App Relevant Shortcuts', description
+                )
                 report.add_script()
-                data_headers = ('Start','End','Bundle ID','Day of the Week','GMT Offset','Entry Creation')
+                data_headers = (
+                    'Start',
+                    'End',
+                    'Bundle ID',
+                    'Day of the Week',
+                    'GMT Offset',
+                    'Entry Creation',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -489,7 +752,8 @@ class KnowledgeC(ab.AbstractArtifact):
 
         if version.parse(iOSversion) >= version.parse("12"):
             cursor = db.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zobject.zstartdate+978307200,'unixepoch'),
             datetime(zobject.zenddate+978307200,'unixepoch'),
@@ -513,10 +777,12 @@ class KnowledgeC(ab.AbstractArtifact):
             from zobject
             where
             zobject.zstreamname = '/display/isBacklit'
-            """)
+            """
+            )
         elif version.parse(iOSversion) == version.parse("11"):
             cursor = db.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zobject.zstartdate+978307200,'unixepoch'),
             datetime(zobject.zenddate+978307200,'unixepoch'),
@@ -540,7 +806,8 @@ class KnowledgeC(ab.AbstractArtifact):
             from zobject
             where
             zobject.zstreamname = '/display/isBacklit'
-            """)
+            """
+            )
         else:
             logfunc("Unsupported version for KnowledgC Backlit" + iOSversion)
             return ()
@@ -551,12 +818,23 @@ class KnowledgeC(ab.AbstractArtifact):
             data_list = []
             if version.parse(iOSversion) >= version.parse("12"):
                 for row in all_rows:
-                    data_list.append((row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7]))
+                    data_list.append(
+                        (row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7])
+                    )
 
                 report = ArtifactHtmlReport('KnowledgeC Device is Backlit')
                 report.start_artifact_report(report_folder, 'Device is Backlit')
                 report.add_script()
-                data_headers = ('Start','End','Screen is Backlit','Usage in Seconds','Usage in Minutes','Day of Week','GMT Offset','Entry Creation')
+                data_headers = (
+                    'Start',
+                    'End',
+                    'Screen is Backlit',
+                    'Usage in Seconds',
+                    'Usage in Minutes',
+                    'Day of Week',
+                    'GMT Offset',
+                    'Entry Creation',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -568,12 +846,23 @@ class KnowledgeC(ab.AbstractArtifact):
 
             elif version.parse(iOSversion) == version.parse("11"):
                 for row in all_rows:
-                    data_list.append((row[0],row[1],row[2],row[3],row[4],row[5],row[6]))
+                    data_list.append(
+                        (row[0], row[1], row[2], row[3], row[4], row[5], row[6])
+                    )
 
                 report = ArtifactHtmlReport('KnowledgeC Device is Backlit')
                 report.start_artifact_report(report_folder, 'Device is Backlit')
                 report.add_script()
-                data_headers = ('Start','End','Screen is Backlit','Usage in Seconds','Usage in Minutes','Day of Week','GMT Offset','Entry Creation')
+                data_headers = (
+                    'Start',
+                    'End',
+                    'Screen is Backlit',
+                    'Usage in Seconds',
+                    'Usage in Minutes',
+                    'Day of Week',
+                    'GMT Offset',
+                    'Entry Creation',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -586,7 +875,8 @@ class KnowledgeC(ab.AbstractArtifact):
             logfunc('No data available in Device is Backlit')
 
         if version.parse(iOSversion) >= version.parse("11"):
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zobject.zstartdate+978307200,'unixepoch'),
             datetime(zobject.zenddate+978307200,'unixepoch'),
@@ -608,19 +898,29 @@ class KnowledgeC(ab.AbstractArtifact):
             where
             zstreamname like '/device/BatteryPercentage'
                 """
-                )
+            )
 
             all_rows = cursor.fetchall()
             usageentries = len(all_rows)
             data_list = []
             for row in all_rows:
-                data_list.append((row[0], row[1], row[2], row[3], row[4], row[5], row[6]))
+                data_list.append(
+                    (row[0], row[1], row[2], row[3], row[4], row[5], row[6])
+                )
 
             description = ''
             report = ArtifactHtmlReport('KnowledgeC Battery Level')
             report.start_artifact_report(report_folder, 'Battery Level', description)
             report.add_script()
-            data_headers = ('Start','End','Battery Level','Usage in Seconds','Day of the Week','GMT Offset','Entry Creation' )
+            data_headers = (
+                'Start',
+                'End',
+                'Battery Level',
+                'Usage in Seconds',
+                'Day of the Week',
+                'GMT Offset',
+                'Entry Creation',
+            )
             report.write_artifact_data_table(data_headers, data_list, file_found)
             report.end_artifact_report()
 
@@ -631,7 +931,8 @@ class KnowledgeC(ab.AbstractArtifact):
             timeline(report_folder, tlactivity, data_list, data_headers)
 
         if version.parse(iOSversion) >= version.parse("11"):
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zobject.zstartdate+978307200,'unixepoch'),
             datetime(zobject.zenddate+978307200,'unixepoch'),
@@ -664,13 +965,37 @@ class KnowledgeC(ab.AbstractArtifact):
             if usageentries > 0:
                 data_list = []
                 for row in all_rows:
-                    data_list.append((row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8]))
+                    data_list.append(
+                        (
+                            row[0],
+                            row[1],
+                            row[2],
+                            row[3],
+                            row[4],
+                            row[5],
+                            row[6],
+                            row[7],
+                            row[8],
+                        )
+                    )
 
                 description = ''
                 report = ArtifactHtmlReport('KnowledgeC Bluetooth Connections')
-                report.start_artifact_report(report_folder, 'Bluetooth Connections', description)
+                report.start_artifact_report(
+                    report_folder, 'Bluetooth Connections', description
+                )
                 report.add_script()
-                data_headers = ('Start','End','Bluetooth Address','Bluetooth Name','Usage in Seconds','Usage in Minutes','Day of Week','GMT Offset','Entry Creation')
+                data_headers = (
+                    'Start',
+                    'End',
+                    'Bluetooth Address',
+                    'Bluetooth Name',
+                    'Usage in Seconds',
+                    'Usage in Minutes',
+                    'Day of Week',
+                    'GMT Offset',
+                    'Entry Creation',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -683,7 +1008,8 @@ class KnowledgeC(ab.AbstractArtifact):
                 logfunc('No data available in Bluetooth Connections')
 
         if version.parse(iOSversion) >= version.parse("11"):
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zobject.zstartdate+978307200,'unixepoch'),
             datetime(zobject.zenddate+978307200,'unixepoch'),
@@ -708,20 +1034,34 @@ class KnowledgeC(ab.AbstractArtifact):
             zobject
             where
             zstreamname is '/carplay/isConnected'
-                """)
+                """
+            )
 
             all_rows = cursor.fetchall()
             usageentries = len(all_rows)
             if usageentries > 0:
                 data_list = []
                 for row in all_rows:
-                    data_list.append((row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7]))
+                    data_list.append(
+                        (row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7])
+                    )
 
                 description = ''
                 report = ArtifactHtmlReport('KnowledgeC Car Play Connections')
-                report.start_artifact_report(report_folder, 'Car Play Connections', description)
+                report.start_artifact_report(
+                    report_folder, 'Car Play Connections', description
+                )
                 report.add_script()
-                data_headers = ('Start','End','Car Play Connected','Usage in Seconds','Usage in Minutes','Day of Week','GMT Offset','Entry Creation')
+                data_headers = (
+                    'Start',
+                    'End',
+                    'Car Play Connected',
+                    'Usage in Seconds',
+                    'Usage in Minutes',
+                    'Day of Week',
+                    'GMT Offset',
+                    'Entry Creation',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -734,7 +1074,8 @@ class KnowledgeC(ab.AbstractArtifact):
                 logfunc('No data available in Car Play Connections')
 
         if version.parse(iOSversion) >= version.parse("13"):
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zobject.zstartdate+978307200,'unixepoch'),
             datetime(zobject.zenddate+978307200,'unixepoch'),
@@ -757,20 +1098,45 @@ class KnowledgeC(ab.AbstractArtifact):
             zobject, zsource
             where zobject.zsource = zsource.z_pk
             and zstreamname = '/disk/subsystemAccess'
-            """)
+            """
+            )
 
             all_rows = cursor.fetchall()
             usageentries = len(all_rows)
             if usageentries > 0:
                 data_list = []
                 for row in all_rows:
-                    data_list.append((row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8]))
+                    data_list.append(
+                        (
+                            row[0],
+                            row[1],
+                            row[2],
+                            row[3],
+                            row[4],
+                            row[5],
+                            row[6],
+                            row[7],
+                            row[8],
+                        )
+                    )
 
                 description = ''
                 report = ArtifactHtmlReport('KnowledgeC Disk Subsystem Access')
-                report.start_artifact_report(report_folder, 'Disk Subsystem Access', description)
+                report.start_artifact_report(
+                    report_folder, 'Disk Subsystem Access', description
+                )
                 report.add_script()
-                data_headers = ('Start','End','Bundle ID','Value String','Usage in Seconds','Usage in Minutes','Day of Week','GMT Offset','Entry Creation')
+                data_headers = (
+                    'Start',
+                    'End',
+                    'Bundle ID',
+                    'Value String',
+                    'Usage in Seconds',
+                    'Usage in Minutes',
+                    'Day of Week',
+                    'GMT Offset',
+                    'Entry Creation',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -783,7 +1149,8 @@ class KnowledgeC(ab.AbstractArtifact):
                 logfunc('No data available in Disk Subsystem Access')
 
         if version.parse(iOSversion) >= version.parse("12"):
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zobject.zstartdate+978307200,'unixepoch'),
             datetime(zobject.zenddate+978307200,'unixepoch'),
@@ -805,20 +1172,34 @@ class KnowledgeC(ab.AbstractArtifact):
             zobject
             where
             zstreamname = '/inferred/motion'
-                """)
+                """
+            )
 
             all_rows = cursor.fetchall()
             usageentries = len(all_rows)
             if usageentries > 0:
                 data_list = []
                 for row in all_rows:
-                    data_list.append((row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7]))
+                    data_list.append(
+                        (row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7])
+                    )
 
                 description = ''
                 report = ArtifactHtmlReport('KnowledgeC Do Not Disturb')
-                report.start_artifact_report(report_folder, 'Do Not Disturb', description)
+                report.start_artifact_report(
+                    report_folder, 'Do Not Disturb', description
+                )
                 report.add_script()
-                data_headers = ('Start','End','Value','Usage in Seconds','Usage in Minutes','Day of Week','GMT Offset','Entry Creation')
+                data_headers = (
+                    'Start',
+                    'End',
+                    'Value',
+                    'Usage in Seconds',
+                    'Usage in Minutes',
+                    'Day of Week',
+                    'GMT Offset',
+                    'Entry Creation',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -832,7 +1213,6 @@ class KnowledgeC(ab.AbstractArtifact):
 
         data_list = []
         if version.parse(iOSversion) >= version.parse("11"):
-
 
             extension = ".bplist"
             dump = True
@@ -875,7 +1255,9 @@ class KnowledgeC(ab.AbstractArtifact):
                 f = row[1]
                 intentclass = str(row[2])
                 intententverb = str(row[3])
-                output_file = open(os.path.join(outpath, "dirty", "D_Z_PK" + pkvplist), "wb") # export dirty from DB
+                output_file = open(
+                    os.path.join(outpath, "dirty", "D_Z_PK" + pkvplist), "wb"
+                )  # export dirty from DB
                 output_file.write(f)
                 output_file.close()
 
@@ -883,15 +1265,21 @@ class KnowledgeC(ab.AbstractArtifact):
                 plistg = ccl_bplist.load(g)
 
                 if version.parse(iOSversion) < version.parse("12"):
-                    ns_keyed_archiver_objg = ccl_bplist.deserialise_NsKeyedArchiver(plistg)
+                    ns_keyed_archiver_objg = ccl_bplist.deserialise_NsKeyedArchiver(
+                        plistg
+                    )
                     newbytearray = ns_keyed_archiver_objg
                 else:
-                    ns_keyed_archiver_objg = ccl_bplist.deserialise_NsKeyedArchiver(plistg)
+                    ns_keyed_archiver_objg = ccl_bplist.deserialise_NsKeyedArchiver(
+                        plistg
+                    )
                     newbytearray = ns_keyed_archiver_objg["NS.data"]
 
                 dirtcount = dirtcount + 1
 
-                binfile = open(os.path.join(outpath, "clean", "C_Z_PK" + pkvplist), "wb")
+                binfile = open(
+                    os.path.join(outpath, "clean", "C_Z_PK" + pkvplist), "wb"
+                )
                 binfile.write(newbytearray)
                 binfile.close()
 
@@ -932,13 +1320,13 @@ class KnowledgeC(ab.AbstractArtifact):
                 # logfunc some values from clean bplist
                 if version.parse(iOSversion) >= version.parse("13"):
                     try:
-                        NSdata = ns_keyed_archiver_obj["root"]["intent"]["backingStore"][
-                            "bytes"
-                        ]
+                        NSdata = ns_keyed_archiver_obj["root"]["intent"][
+                            "backingStore"
+                        ]["bytes"]
                     except:
-                        NSdata = ns_keyed_archiver_obj["root"]["intent"]["backingStore"][
-                            "data"
-                        ]["NS.data"]
+                        NSdata = ns_keyed_archiver_obj["root"]["intent"][
+                            "backingStore"
+                        ]["data"]["NS.data"]
                         pass
                 else:
                     NSdata = ns_keyed_archiver_obj["root"]["intent"]["backingStore"][
@@ -949,7 +1337,9 @@ class KnowledgeC(ab.AbstractArtifact):
                 parsedNSData = ""
                 # Default true
                 if dump == True:
-                    nsdata_file = os.path.join(outpath, "clean", cfilename + "_nsdata.bin")
+                    nsdata_file = os.path.join(
+                        outpath, "clean", cfilename + "_nsdata.bin"
+                    )
                     binfile = open(nsdata_file, "wb")
                     if version.parse(iOSversion) >= version.parse("13"):
                         try:
@@ -967,9 +1357,9 @@ class KnowledgeC(ab.AbstractArtifact):
                             pass
                     else:
                         binfile.write(
-                            ns_keyed_archiver_obj["root"]["intent"]["backingStore"]["data"][
-                                "NS.data"
-                            ]
+                            ns_keyed_archiver_obj["root"]["intent"]["backingStore"][
+                                "data"
+                            ]["NS.data"]
                         )
                     binfile.close()
                     messages = ParseProto(nsdata_file)
@@ -986,22 +1376,37 @@ class KnowledgeC(ab.AbstractArtifact):
                 NSendDate = ccl_bplist.convert_NSDate(
                     (ns_keyed_archiver_obj["root"]["dateInterval"]["NS.endDate"])
                 )
-                NSduration = ns_keyed_archiver_obj["root"]["dateInterval"]["NS.duration"]
+                NSduration = ns_keyed_archiver_obj["root"]["dateInterval"][
+                    "NS.duration"
+                ]
                 Siri = ns_keyed_archiver_obj["root"]["_donatedBySiri"]
-
 
                 if parsedNSData:
                     parsedf = str(parsedNSData).replace("\\n", "<br>")
                 else:
                     parsedf = str(NSdata).replace("\\n", "<br>")
 
-                data_list.append(( str(NSstartDate),str(A), str(B), str(Siri), str(NSendDate), str(NSduration), parsedf, (textwrap.fill(str(NSdata), width=50)), cfilename))
+                data_list.append(
+                    (
+                        str(NSstartDate),
+                        str(A),
+                        str(B),
+                        str(Siri),
+                        str(NSendDate),
+                        str(NSduration),
+                        parsedf,
+                        (textwrap.fill(str(NSdata), width=50)),
+                        cfilename,
+                    )
+                )
 
             logfunc("iOS - KnowledgeC ZSTRUCTUREDMETADATA bplist extractor")
             logfunc("By: @phillmoore & @AlexisBrignoni")
             logfunc("thinkdfir.com & abrignoni.com")
             logfunc("")
-            logfunc("Bplists from the Z_DKINTENTMETADATAKEY__SERIALIZEDINTERACTION field.")
+            logfunc(
+                "Bplists from the Z_DKINTENTMETADATAKEY__SERIALIZEDINTERACTION field."
+            )
             logfunc("Exported bplists (dirty): " + str(dirtcount))
             logfunc("Exported bplists (clean): " + str(cleancount))
             logfunc("")
@@ -1011,8 +1416,20 @@ class KnowledgeC(ab.AbstractArtifact):
             report = ArtifactHtmlReport('KnowledgeC Intents')
             report.start_artifact_report(report_folder, 'Intents', description)
             report.add_script()
-            data_headers = ('NS Start Date','Intent Class','Intent Verb','Siri?','NS Send Date','NS Duration','NS Data Protobuf', 'NS Data', 'Traceback' )
-            report.write_artifact_data_table(data_headers, data_list, file_found, html_escape=False)
+            data_headers = (
+                'NS Start Date',
+                'Intent Class',
+                'Intent Verb',
+                'Siri?',
+                'NS Send Date',
+                'NS Duration',
+                'NS Data Protobuf',
+                'NS Data',
+                'Traceback',
+            )
+            report.write_artifact_data_table(
+                data_headers, data_list, file_found, html_escape=False
+            )
             report.end_artifact_report()
 
             tlactivity = 'KnowledgeC Intents'
@@ -1020,7 +1437,8 @@ class KnowledgeC(ab.AbstractArtifact):
 
         if version.parse(iOSversion) >= version.parse("9"):
             cursor = db.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zobject.zstartdate+978307200,'unixepoch'),
             datetime(zobject.zenddate+978307200,'unixepoch'),
@@ -1040,7 +1458,8 @@ class KnowledgeC(ab.AbstractArtifact):
             datetime(zobject.zcreationdate+978307200,'unixepoch')
             from zobject
             where zstreamname is '/app/inFocus'
-            """)
+            """
+            )
 
         all_rows = cursor.fetchall()
         usageentries = len(all_rows)
@@ -1048,12 +1467,23 @@ class KnowledgeC(ab.AbstractArtifact):
             data_list = []
             if version.parse(iOSversion) >= version.parse("9"):
                 for row in all_rows:
-                    data_list.append((row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7]))
+                    data_list.append(
+                        (row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7])
+                    )
 
                 report = ArtifactHtmlReport('KnowledgeC Application In Focus')
                 report.start_artifact_report(report_folder, 'App In Focus')
                 report.add_script()
-                data_headers = ('Start','End','Bundle ID', 'Usage in Seconds', 'Usage in Minutes','Day of Week','GMT Offset','Entry Creation')
+                data_headers = (
+                    'Start',
+                    'End',
+                    'Bundle ID',
+                    'Usage in Seconds',
+                    'Usage in Minutes',
+                    'Day of Week',
+                    'GMT Offset',
+                    'Entry Creation',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -1067,7 +1497,8 @@ class KnowledgeC(ab.AbstractArtifact):
             logfunc('No data available in Application in Focus')
 
         if version.parse(iOSversion) >= version.parse("12"):
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zobject.zstartdate+978307200,'unixepoch'),
             datetime(zobject.zenddate+978307200,'unixepoch'),
@@ -1089,9 +1520,11 @@ class KnowledgeC(ab.AbstractArtifact):
             zobject, zstructuredmetadata
             where zobject.zstructuredmetadata = zstructuredmetadata.z_pk
             and zstreamname = '/app/install'
-                """)
+                """
+            )
         else:
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zobject.zstartdate+978307200,'unixepoch'),
             datetime(zobject.zenddate+978307200,'unixepoch'),
@@ -1111,7 +1544,8 @@ class KnowledgeC(ab.AbstractArtifact):
             zobject, zstructuredmetadata
             where zobject.zstructuredmetadata = zstructuredmetadata.z_pk
             and zstreamname = "/app/install"
-            """)
+            """
+            )
 
         all_rows = cursor.fetchall()
         usageentries = len(all_rows)
@@ -1120,12 +1554,23 @@ class KnowledgeC(ab.AbstractArtifact):
             if version.parse(iOSversion) >= version.parse("12"):
 
                 for row in all_rows:
-                    data_list.append((row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7]))
+                    data_list.append(
+                        (row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7])
+                    )
 
                 report = ArtifactHtmlReport('KnowledgeC Installed Apps')
                 report.start_artifact_report(report_folder, 'Installed Apps')
                 report.add_script()
-                data_headers = ('Start','End','Bundle ID','App Category', 'App Name','Day of Week','GMT Offset','Entry Creation')
+                data_headers = (
+                    'Start',
+                    'End',
+                    'Bundle ID',
+                    'App Category',
+                    'App Name',
+                    'Day of Week',
+                    'GMT Offset',
+                    'Entry Creation',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -1136,12 +1581,19 @@ class KnowledgeC(ab.AbstractArtifact):
                 timeline(report_folder, tlactivity, data_list, data_headers)
             else:
                 for row in all_rows:
-                    data_list.append((row[0],row[1],row[2],row[3],row[4],row[5]))
+                    data_list.append((row[0], row[1], row[2], row[3], row[4], row[5]))
 
                 report = ArtifactHtmlReport('KnowledgeC Installed Apps')
                 report.start_artifact_report(report_folder, 'Installed Apps')
                 report.add_script()
-                data_headers = ('Start','End','Bundle ID','Day of Week','GMT Offset','Entry Creation' )
+                data_headers = (
+                    'Start',
+                    'End',
+                    'Bundle ID',
+                    'Day of Week',
+                    'GMT Offset',
+                    'Entry Creation',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -1154,7 +1606,8 @@ class KnowledgeC(ab.AbstractArtifact):
             logfunc('No data available in Installed Apps')
 
         if version.parse(iOSversion) >= version.parse("12"):
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zobject.zstartdate+978307200,'unixepoch'),
             datetime(zobject.zenddate+978307200,'unixepoch'),
@@ -1205,13 +1658,75 @@ class KnowledgeC(ab.AbstractArtifact):
             if usageentries > 0:
                 data_list = []
                 for row in all_rows:
-                    data_list.append((row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[13], row[14], row[15], row[16], row[17], row[18], row[19], row[20], row[21], row[22], row[23], row[24], row[25], row[26], row[27]))
+                    data_list.append(
+                        (
+                            row[0],
+                            row[1],
+                            row[2],
+                            row[3],
+                            row[4],
+                            row[5],
+                            row[6],
+                            row[7],
+                            row[8],
+                            row[9],
+                            row[10],
+                            row[11],
+                            row[12],
+                            row[13],
+                            row[14],
+                            row[15],
+                            row[16],
+                            row[17],
+                            row[18],
+                            row[19],
+                            row[20],
+                            row[21],
+                            row[22],
+                            row[23],
+                            row[24],
+                            row[25],
+                            row[26],
+                            row[27],
+                        )
+                    )
 
                 description = ''
                 report = ArtifactHtmlReport('KnowledgeC Location Activity')
-                report.start_artifact_report(report_folder, 'Location Activity', description)
+                report.start_artifact_report(
+                    report_folder, 'Location Activity', description
+                )
                 report.add_script()
-                data_headers = ('Timestamp','End','Bundle ID','Name','Display Name','Formatted Address', 'City','State/Province','Country','Postal Code','Subthoroughfare','Thoroughfare','Phone Numebers','URL','Activity Type', 'Content Description','User Activity Required String','Content URL','Unique ID','Latitude','Longitude','Source ID','Activity UUID','Item ID','Source ID','Day of the Week','GMT Offset','Entry Creation')
+                data_headers = (
+                    'Timestamp',
+                    'End',
+                    'Bundle ID',
+                    'Name',
+                    'Display Name',
+                    'Formatted Address',
+                    'City',
+                    'State/Province',
+                    'Country',
+                    'Postal Code',
+                    'Subthoroughfare',
+                    'Thoroughfare',
+                    'Phone Numebers',
+                    'URL',
+                    'Activity Type',
+                    'Content Description',
+                    'User Activity Required String',
+                    'Content URL',
+                    'Unique ID',
+                    'Latitude',
+                    'Longitude',
+                    'Source ID',
+                    'Activity UUID',
+                    'Item ID',
+                    'Source ID',
+                    'Day of the Week',
+                    'GMT Offset',
+                    'Entry Creation',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -1227,7 +1742,8 @@ class KnowledgeC(ab.AbstractArtifact):
                 logfunc('No data available in Location Activity')
 
         if version.parse(iOSversion) >= version.parse("11"):
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zobject.zstartdate+978307200,'unixepoch'),
             datetime(zobject.zenddate+978307200,'unixepoch'),
@@ -1250,20 +1766,33 @@ class KnowledgeC(ab.AbstractArtifact):
             from
             zobject
             where zstreamname = '/device/isLocked'
-            """)
+            """
+            )
 
             all_rows = cursor.fetchall()
             usageentries = len(all_rows)
             if usageentries > 0:
                 data_list = []
                 for row in all_rows:
-                    data_list.append((row[0], row[1], row[2], row[3], row[4], row[5], row[6]))
+                    data_list.append(
+                        (row[0], row[1], row[2], row[3], row[4], row[5], row[6])
+                    )
 
                 description = ''
                 report = ArtifactHtmlReport('KnowledgeC Device Locked')
-                report.start_artifact_report(report_folder, 'Device Locked', description)
+                report.start_artifact_report(
+                    report_folder, 'Device Locked', description
+                )
                 report.add_script()
-                data_headers = ('Start','End','Is Locked?','Usage in Seconds','Day of the Week','GMT Offset','Entry Creation' )
+                data_headers = (
+                    'Start',
+                    'End',
+                    'Is Locked?',
+                    'Usage in Seconds',
+                    'Day of the Week',
+                    'GMT Offset',
+                    'Entry Creation',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -1276,7 +1805,8 @@ class KnowledgeC(ab.AbstractArtifact):
                 logfunc('No data in KnowledgeC Device Locked')
 
         if version.parse(iOSversion) >= version.parse("11"):
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zobject.zstartdate+978307200,'unixepoch'),
             datetime(zobject.zenddate+978307200,'unixepoch'),
@@ -1303,20 +1833,53 @@ class KnowledgeC(ab.AbstractArtifact):
             zobject, zstructuredmetadata
             where zobject.zstructuredmetadata = zstructuredmetadata.z_pk
             and zstreamname =  '/media/nowPlaying'
-            """)
+            """
+            )
 
             all_rows = cursor.fetchall()
             usageentries = len(all_rows)
             if usageentries > 0:
                 data_list = []
                 for row in all_rows:
-                    data_list.append((row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12]))
+                    data_list.append(
+                        (
+                            row[0],
+                            row[1],
+                            row[2],
+                            row[3],
+                            row[4],
+                            row[5],
+                            row[6],
+                            row[7],
+                            row[8],
+                            row[9],
+                            row[10],
+                            row[11],
+                            row[12],
+                        )
+                    )
 
                 description = ''
                 report = ArtifactHtmlReport('KnowledgeC Media Playing')
-                report.start_artifact_report(report_folder, 'Media Playing', description)
+                report.start_artifact_report(
+                    report_folder, 'Media Playing', description
+                )
                 report.add_script()
-                data_headers = ('Start','End','Bundle ID','Now Playing Album','Now Playing Artists','Playing Genre','Playing Title', 'Now Playing Duration','Usage in Seconds','Usage in Minutes','Day of Week','GMT Offset','Entry Creation')
+                data_headers = (
+                    'Start',
+                    'End',
+                    'Bundle ID',
+                    'Now Playing Album',
+                    'Now Playing Artists',
+                    'Playing Genre',
+                    'Playing Title',
+                    'Now Playing Duration',
+                    'Usage in Seconds',
+                    'Usage in Minutes',
+                    'Day of Week',
+                    'GMT Offset',
+                    'Entry Creation',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -1330,7 +1893,8 @@ class KnowledgeC(ab.AbstractArtifact):
                 logfunc('No data available in Media Playing')
 
         if version.parse(iOSversion) >= version.parse("12"):
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zobject.zstartdate+978307200,'unixepoch'),
             datetime(zobject.zenddate+978307200,'unixepoch'),
@@ -1357,17 +1921,47 @@ class KnowledgeC(ab.AbstractArtifact):
             where zobject.zstructuredmetadata = zstructuredmetadata.z_pk
             and zstreamname = '/app/activity'
             and (zobject.zvaluestring = 'com.apple.mobilenotes' or zobject.zvaluestring = 'com.apple.Notes')
-            """)
+            """
+            )
             all_rows = cursor.fetchall()
             usageentries = len(all_rows)
             if usageentries > 0:
                 data_list = []
-                for row in all_rows:    data_list.append((row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],row[11]))
+                for row in all_rows:
+                    data_list.append(
+                        (
+                            row[0],
+                            row[1],
+                            row[2],
+                            row[3],
+                            row[4],
+                            row[5],
+                            row[6],
+                            row[7],
+                            row[8],
+                            row[9],
+                            row[10],
+                            row[11],
+                        )
+                    )
 
                 report = ArtifactHtmlReport('KnowledgeC Notes - Activity')
                 report.start_artifact_report(report_folder, 'Notes - Activity')
                 report.add_script()
-                data_headers = ('Start','End','Bundle ID','Activity Type','User Activity Required String','ID','Unique ID','Activity UUID','Day of Week','GMT Offset','Entry Creation','Expiration Date' )
+                data_headers = (
+                    'Start',
+                    'End',
+                    'Bundle ID',
+                    'Activity Type',
+                    'User Activity Required String',
+                    'ID',
+                    'Unique ID',
+                    'Activity UUID',
+                    'Day of Week',
+                    'GMT Offset',
+                    'Entry Creation',
+                    'Expiration Date',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -1381,7 +1975,8 @@ class KnowledgeC(ab.AbstractArtifact):
                 logfunc('No data available in Notes Activity')
 
         if version.parse(iOSversion) >= version.parse("11"):
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zobject.zstartdate+978307200,'unixepoch'),
             datetime(zobject.zenddate+978307200,'unixepoch'),
@@ -1407,20 +2002,34 @@ class KnowledgeC(ab.AbstractArtifact):
             zobject
             where
             zstreamname = '/display/orientation'
-            """)
+            """
+            )
 
             all_rows = cursor.fetchall()
             usageentries = len(all_rows)
             if usageentries > 0:
                 data_list = []
                 for row in all_rows:
-                    data_list.append((row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7]))
+                    data_list.append(
+                        (row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7])
+                    )
 
                 description = ''
                 report = ArtifactHtmlReport('KnowledgeC Screen Orientation')
-                report.start_artifact_report(report_folder, 'Screen Orientation', description)
+                report.start_artifact_report(
+                    report_folder, 'Screen Orientation', description
+                )
                 report.add_script()
-                data_headers = ('Start','End','Orientation','Usage in Seconds','Usage in Minutes','Day of Week','GMT Offset','Entry Creation')
+                data_headers = (
+                    'Start',
+                    'End',
+                    'Orientation',
+                    'Usage in Seconds',
+                    'Usage in Minutes',
+                    'Day of Week',
+                    'GMT Offset',
+                    'Entry Creation',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -1434,7 +2043,8 @@ class KnowledgeC(ab.AbstractArtifact):
                 logfunc('No data available in Screen Orientation')
 
         if version.parse(iOSversion) >= version.parse("11"):
-            cursor.execute("""
+            cursor.execute(
+                """
                 select
                 datetime(zobject.zstartdate+978307200,'unixepoch') ,
                 datetime(zobject.zenddate+978307200,'unixepoch'),
@@ -1459,20 +2069,31 @@ class KnowledgeC(ab.AbstractArtifact):
                 zobject
                 where
                 zstreamname = '/device/isPluggedIn'
-                """)
+                """
+            )
 
             all_rows = cursor.fetchall()
             usageentries = len(all_rows)
             if usageentries > 0:
                 data_list = []
                 for row in all_rows:
-                    data_list.append((row[0], row[1], row[2], row[3], row[4], row[5], row[6]))
+                    data_list.append(
+                        (row[0], row[1], row[2], row[3], row[4], row[5], row[6])
+                    )
 
                 description = ''
                 report = ArtifactHtmlReport('KnowledgeC Plugged In')
                 report.start_artifact_report(report_folder, 'Plugged In', description)
                 report.add_script()
-                data_headers = ('Start','End','Is Plugged In?','Usage in Seconds','Day of the Week','GMT Offset','Entry Creation' )
+                data_headers = (
+                    'Start',
+                    'End',
+                    'Is Plugged In?',
+                    'Usage in Seconds',
+                    'Day of the Week',
+                    'GMT Offset',
+                    'Entry Creation',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -1486,7 +2107,8 @@ class KnowledgeC(ab.AbstractArtifact):
 
         if version.parse(iOSversion) >= version.parse("12"):
             cursor = db.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zobject.zstartdate+978307200,'unixepoch'),
             datetime(zobject.zenddate+978307200,'unixepoch'),
@@ -1510,10 +2132,12 @@ class KnowledgeC(ab.AbstractArtifact):
             where zobject.zstructuredmetadata = zstructuredmetadata.z_pk
             and  zobject.zsource = zsource.z_pk
             and zstreamname = '/safari/history'
-            """)
+            """
+            )
         elif version.parse(iOSversion) == version.parse("11"):
             cursor = db.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zobject.zstartdate+978307200,'unixepoch'),
             datetime(zobject.zenddate+978307200,'unixepoch'),
@@ -1534,7 +2158,8 @@ class KnowledgeC(ab.AbstractArtifact):
             zobject, zsource
             where zobject.zsource = zsource.z_pk
             and zstreamname = '/safari/history'
-            """)
+            """
+            )
         else:
             logfunc("Unsupported version for KnowledgC Safari iOS " + iOSversion)
             return ()
@@ -1546,12 +2171,23 @@ class KnowledgeC(ab.AbstractArtifact):
             if version.parse(iOSversion) >= version.parse("12"):
 
                 for row in all_rows:
-                    data_list.append((row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7]))
+                    data_list.append(
+                        (row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7])
+                    )
 
                 report = ArtifactHtmlReport('KnowledgeC Safari Browsing')
                 report.start_artifact_report(report_folder, 'Safari Browsing')
                 report.add_script()
-                data_headers = ('Start','End','Title','URL', 'Bundle ID','Day of Week','GMT Offset','Entry Creation')
+                data_headers = (
+                    'Start',
+                    'End',
+                    'Title',
+                    'URL',
+                    'Bundle ID',
+                    'Day of Week',
+                    'GMT Offset',
+                    'Entry Creation',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -1563,12 +2199,22 @@ class KnowledgeC(ab.AbstractArtifact):
 
             else:
                 for row in all_rows:
-                    data_list.append((row[0],row[1],row[2],row[3],row[4],row[5],row[6]))
+                    data_list.append(
+                        (row[0], row[1], row[2], row[3], row[4], row[5], row[6])
+                    )
 
                 report = ArtifactHtmlReport('KnowledgeC Safari Browsing')
                 report.start_artifact_report(report_folder, 'Safari Browsing')
                 report.add_script()
-                data_headers = ('Start','End','URL','Bundle ID','Day of Week','GMT Offset','Entry Creation' )
+                data_headers = (
+                    'Start',
+                    'End',
+                    'URL',
+                    'Bundle ID',
+                    'Day of Week',
+                    'GMT Offset',
+                    'Entry Creation',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -1582,7 +2228,8 @@ class KnowledgeC(ab.AbstractArtifact):
             logfunc('No data available in Safari Browsing')
 
         if version.parse(iOSversion) >= version.parse("12"):
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zobject.zstartdate+978307200,'unixepoch'),
             zobject.zvaluestring,
@@ -1615,7 +2262,13 @@ class KnowledgeC(ab.AbstractArtifact):
                 report = ArtifactHtmlReport('KnowledgeC Siri Usage')
                 report.start_artifact_report(report_folder, 'Siri Usage', description)
                 report.add_script()
-                data_headers = ('Start','App Name','Weekday','GMT Offset','Entry Creation' )
+                data_headers = (
+                    'Start',
+                    'App Name',
+                    'Weekday',
+                    'GMT Offset',
+                    'Entry Creation',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -1628,7 +2281,8 @@ class KnowledgeC(ab.AbstractArtifact):
                 logfunc('No data in KnowledgeC Siri Usage')
 
         if version.parse(iOSversion) >= version.parse("12"):
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zobject.zstartdate+978307200,'unixepoch'),
             datetime(zobject.zenddate+978307200,'unixepoch'),
@@ -1649,20 +2303,34 @@ class KnowledgeC(ab.AbstractArtifact):
             from
             zobject
             where zstreamname = '/app/usage'
-            """)
+            """
+            )
         all_rows = cursor.fetchall()
         usageentries = len(all_rows)
         if usageentries > 0:
             data_list = []
             for row in all_rows:
-                data_list.append((row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7]))
+                data_list.append(
+                    (row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7])
+                )
 
             description = ''
             report = ArtifactHtmlReport('KnowledgeC App Usage')
             report.start_artifact_report(report_folder, 'App Usage', description)
             report.add_script()
-            data_headers = ('Start','End','Bundle ID','Usage in Seconds','Usage in Minutes','Day of the Week','GMT Offset','Entry Creation')
-            report.write_artifact_data_table(data_headers, data_list, file_found, html_escape=False)
+            data_headers = (
+                'Start',
+                'End',
+                'Bundle ID',
+                'Usage in Seconds',
+                'Usage in Minutes',
+                'Day of the Week',
+                'GMT Offset',
+                'Entry Creation',
+            )
+            report.write_artifact_data_table(
+                data_headers, data_list, file_found, html_escape=False
+            )
             report.end_artifact_report()
 
             tsvname = 'KnowledgeC App Usage'
@@ -1674,7 +2342,8 @@ class KnowledgeC(ab.AbstractArtifact):
             logfunc('No data in KnowledgeC App Usage')
 
         if version.parse(iOSversion) >= version.parse("12"):
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zobject.zstartdate+978307200,'unixepoch'),
             datetime(zobject.zenddate+978307200,'unixepoch'),
@@ -1692,7 +2361,8 @@ class KnowledgeC(ab.AbstractArtifact):
             from
             zobject
             where zstreamname = '/system/userWakingEvent'
-            """)
+            """
+            )
 
             all_rows = cursor.fetchall()
             usageentries = len(all_rows)
@@ -1703,9 +2373,17 @@ class KnowledgeC(ab.AbstractArtifact):
 
                 description = ''
                 report = ArtifactHtmlReport('KnowledgeC User Waking Event')
-                report.start_artifact_report(report_folder, 'User Waking Event', description)
+                report.start_artifact_report(
+                    report_folder, 'User Waking Event', description
+                )
                 report.add_script()
-                data_headers = ('Start','End','Day of Week','GMT Offset','Entry Creation')
+                data_headers = (
+                    'Start',
+                    'End',
+                    'Day of Week',
+                    'GMT Offset',
+                    'Entry Creation',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -1719,7 +2397,8 @@ class KnowledgeC(ab.AbstractArtifact):
                 logfunc('No data available in User Waking Event')
 
         if version.parse(iOSversion) >= version.parse("12"):
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zobject.zstartdate+978307200,'unixepoch'),
             datetime(zobject.zenddate+978307200,'unixepoch'),
@@ -1751,13 +2430,37 @@ class KnowledgeC(ab.AbstractArtifact):
             if usageentries > 0:
                 data_list = []
                 for row in all_rows:
-                    data_list.append((row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9]))
+                    data_list.append(
+                        (
+                            row[0],
+                            row[1],
+                            row[2],
+                            row[3],
+                            row[4],
+                            row[5],
+                            row[6],
+                            row[7],
+                            row[8],
+                            row[9],
+                        )
+                    )
 
                 description = ''
                 report = ArtifactHtmlReport('KnowledgeC Web Usage')
                 report.start_artifact_report(report_folder, 'Web Usage', description)
                 report.add_script()
-                data_headers = ('Start','End','App Name','Usage in Seconds','Usage in Minutes','Domain','URL','Day of the Wekk','GMT Offset','Entry Creation')
+                data_headers = (
+                    'Start',
+                    'End',
+                    'App Name',
+                    'Usage in Seconds',
+                    'Usage in Minutes',
+                    'Domain',
+                    'URL',
+                    'Day of the Wekk',
+                    'GMT Offset',
+                    'Entry Creation',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -1771,7 +2474,8 @@ class KnowledgeC(ab.AbstractArtifact):
                 logfunc('No data available in Web Usage')
 
         if version.parse(iOSversion) < version.parse("12"):
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zobject.zstartdate+978307200,'unixepoch'),
             datetime(zobject.zenddate+978307200,'unixepoch'),
@@ -1793,20 +2497,34 @@ class KnowledgeC(ab.AbstractArtifact):
             zobject
             where
             zstreamname = '/widgets/viewed'
-            """)
+            """
+            )
 
             all_rows = cursor.fetchall()
             usageentries = len(all_rows)
             if usageentries > 0:
                 data_list = []
                 for row in all_rows:
-                    data_list.append((row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7]))
+                    data_list.append(
+                        (row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7])
+                    )
 
                 description = ''
                 report = ArtifactHtmlReport('KnowledgeC Widgets Viewed')
-                report.start_artifact_report(report_folder, 'Widgets Viewed', description)
+                report.start_artifact_report(
+                    report_folder, 'Widgets Viewed', description
+                )
                 report.add_script()
-                data_headers = ('Start','End','Bundle ID','Usage in Seconds','Usage in Minutes','Day of Week','GMT Offset','Entry Creation')
+                data_headers = (
+                    'Start',
+                    'End',
+                    'Bundle ID',
+                    'Usage in Seconds',
+                    'Usage in Minutes',
+                    'Day of Week',
+                    'GMT Offset',
+                    'Entry Creation',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 

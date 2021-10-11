@@ -6,16 +6,15 @@ import sys
 import time
 
 from html_report.artifact_report import ArtifactHtmlReport
-from helpers import(is_platform_windows,
-                             open_sqlite_db_readonly, tsv)
+from helpers import is_platform_windows, open_sqlite_db_readonly, tsv
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class MediaLibrary(ab.AbstractArtifact):
+class MediaLibrary(ab.Artifact):
 
     _name = 'Media Library'
-    _search_dirs = ('**/Medialibrary.sqlitedb')
+    _search_dirs = '**/Medialibrary.sqlitedb'
     _category = 'Media Library'
 
     def get(self, files_found, seeker):
@@ -25,7 +24,7 @@ class MediaLibrary(ab.AbstractArtifact):
         # Execute query for retrieving media information
         try:
             cursor.execute(
-            """
+                """
             SELECT ext.title, ext.media_kind, itep.format,
                     ext.location, ext.total_time_ms, ext.file_size, ext.year,
                     alb.album, alba.album_artist, com.composer, gen.genre,
@@ -86,37 +85,61 @@ class MediaLibrary(ab.AbstractArtifact):
         # Recover account information
         data_list_info = []
         cursor.execute(
-        """
+            """
         select * from _MLDATABASEPROPERTIES;
         """
         )
         iOS_info = cursor.fetchall()
 
         iCloud_items = [
-            'MLJaliscoAccountID', 'MPDateLastSynced',
-            'MPDateToSyncWithUbiquitousStore', 'OrderingLanguage']
+            'MLJaliscoAccountID',
+            'MPDateLastSynced',
+            'MPDateToSyncWithUbiquitousStore',
+            'OrderingLanguage',
+        ]
 
         for row in iOS_info:
             for elm in iCloud_items:
                 if row[0] == elm:
-                    data_list_info.append((row[0],row[1]))
+                    data_list_info.append((row[0], row[1]))
 
         report = ArtifactHtmlReport('Media Library')
         report.start_artifact_report(report_folder, 'Media Library')
         report.add_script()
         data_headers_info = ('key', 'value')
-        data_headers = ('Title','Media Type','File Format','File','Total Time (ms)',
-                        'File Size','Year','Album Name','Album Artist','Composer',
-                        'Genre','Track Number', 'Artwork','Content Rating',
-                        'Movie Information','Description','Account ID',
-                        'Date Purchased','Item ID','Purchase History ID','Copyright')
+        data_headers = (
+            'Title',
+            'Media Type',
+            'File Format',
+            'File',
+            'Total Time (ms)',
+            'File Size',
+            'Year',
+            'Album Name',
+            'Album Artist',
+            'Composer',
+            'Genre',
+            'Track Number',
+            'Artwork',
+            'Content Rating',
+            'Movie Information',
+            'Description',
+            'Account ID',
+            'Date Purchased',
+            'Item ID',
+            'Purchase History ID',
+            'Copyright',
+        )
 
-        report.write_artifact_data_table(data_headers_info, data_list_info, file_found, cols_repeated_at_bottom=False)
-        report.write_artifact_data_table(data_headers, data_list, file_found, True, False)
+        report.write_artifact_data_table(
+            data_headers_info, data_list_info, file_found, cols_repeated_at_bottom=False
+        )
+        report.write_artifact_data_table(
+            data_headers, data_list, file_found, True, False
+        )
 
         report.end_artifact_report()
 
         tsvname = 'Media Library'
         tsv(report_folder, data_headers_info, data_list_info, tsvname)
         tsv(report_folder, data_headers, data_list, tsvname)
-

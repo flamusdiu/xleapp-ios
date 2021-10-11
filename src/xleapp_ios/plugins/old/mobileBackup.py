@@ -2,14 +2,14 @@ import os
 import plistlib
 
 from html_report.artifact_report import ArtifactHtmlReport
-from helpers import is_platform_windows,   tsv
+from helpers import is_platform_windows, tsv
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class MobileBackup(ab.AbstractArtifact):
+class MobileBackup(ab.Artifact):
     _name = 'Mobile Backup'
-    _search_dirs = ('*/Preferences/com.apple.MobileBackup.plist')
+    _search_dirs = '*/Preferences/com.apple.MobileBackup.plist'
     _category = 'Mobile Backup'
 
     # Backup version of iOS, iOS version installed at the time of recovery,
@@ -40,7 +40,6 @@ class MobileBackup(ab.AbstractArtifact):
                         data_list.append((key, val))
                     if key == 'RestoreDate':
                         data_list.append((key, val))
-
 
         report = ArtifactHtmlReport('Mobile Backup')
         report.start_artifact_report(report_folder, 'Mobile Backup')

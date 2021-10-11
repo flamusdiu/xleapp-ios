@@ -4,13 +4,13 @@ from helpers import open_sqlite_db_readonly, tsv
 
 import artifacts.artGlobals  # use to get iOS version -> iOSversion = artifacts.artGlobals.versionf
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class ScreentimeAll (ab.AbstractArtifact):
+class ScreentimeAll(ab.Artifact):
 
     _name = 'Screentime Timed Items'
-    _search_dirs = ('**/RMAdminStore-Local.sqlite')
+    _search_dirs = '**/RMAdminStore-Local.sqlite'
     _category = 'Screentime'
 
     def get(self, files_found, seeker):
@@ -19,12 +19,15 @@ class ScreentimeAll (ab.AbstractArtifact):
 
         iOSversion = artifacts.artGlobals.versionf
         if version.parse(iOSversion) < version.parse("12"):
-            logfunc("Unsupported version for Screentime App by Hour on iOS " + iOSversion)
+            logfunc(
+                "Unsupported version for Screentime App by Hour on iOS " + iOSversion
+            )
             return ()
 
         if version.parse(iOSversion) >= version.parse("13"):
             cursor = db.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zusageblock.zstartdate+978307200,'unixepoch'),
             zusagetimeditem.zbundleidentifier,
@@ -64,10 +67,12 @@ class ScreentimeAll (ab.AbstractArtifact):
             and zusageblock.zusage = zusage.z_pk
             and zusage.zuser = zcoreuser.z_pk
             and zusage.zdevice = zcoredevice.z_pk
-                """)
+                """
+            )
         else:
             cursor = db.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zusageblock.zstartdate+978307200,'unixepoch'),
             zusagetimeditem.zbundleidentifier,
@@ -100,7 +105,8 @@ class ScreentimeAll (ab.AbstractArtifact):
             and zusageblock.zusage = zusage.z_pk
             and zusage.zuser = zcoreuser.z_pk
             and zusage.zdevice = zcoredevice.z_pk
-            """)
+            """
+            )
 
         all_rows = cursor.fetchall()
         usageentries = len(all_rows)
@@ -109,12 +115,40 @@ class ScreentimeAll (ab.AbstractArtifact):
             if version.parse(iOSversion) >= version.parse("13"):
 
                 for row in all_rows:
-                    data_list.append((row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],row[11]))
+                    data_list.append(
+                        (
+                            row[0],
+                            row[1],
+                            row[2],
+                            row[3],
+                            row[4],
+                            row[5],
+                            row[6],
+                            row[7],
+                            row[8],
+                            row[9],
+                            row[10],
+                            row[11],
+                        )
+                    )
 
                 report = ArtifactHtmlReport('Screentime Timed Items')
                 report.start_artifact_report(report_folder, 'Timed Items')
                 report.add_script()
-                data_headers = ('Hour','Bundle ID','Domain','Category ID', 'App Usage Time Item in Seconds','App Usage Time Item in Minutes','Number of Pickpus w/o App Usage','Name','Platform','Given Name','Family Name','Family Member Type')
+                data_headers = (
+                    'Hour',
+                    'Bundle ID',
+                    'Domain',
+                    'Category ID',
+                    'App Usage Time Item in Seconds',
+                    'App Usage Time Item in Minutes',
+                    'Number of Pickpus w/o App Usage',
+                    'Name',
+                    'Platform',
+                    'Given Name',
+                    'Family Name',
+                    'Family Member Type',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -122,12 +156,38 @@ class ScreentimeAll (ab.AbstractArtifact):
                 tsv(report_folder, data_headers, data_list, tsvname)
             else:
                 for row in all_rows:
-                    data_list.append((row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10]))
+                    data_list.append(
+                        (
+                            row[0],
+                            row[1],
+                            row[2],
+                            row[3],
+                            row[4],
+                            row[5],
+                            row[6],
+                            row[7],
+                            row[8],
+                            row[9],
+                            row[10],
+                        )
+                    )
 
                 report = ArtifactHtmlReport('Screentime Timed Items')
                 report.start_artifact_report(report_folder, 'Timed Items')
                 report.add_script()
-                data_headers = ('Hour','Bundle ID','Domain','Category ID', 'App Usage Time Item in Seconds','App Usage Time Item in Minutes','Number of Pickpus w/o App Usage','Name','Local User Device State','Given Name','Family Name')
+                data_headers = (
+                    'Hour',
+                    'Bundle ID',
+                    'Domain',
+                    'Category ID',
+                    'App Usage Time Item in Seconds',
+                    'App Usage Time Item in Minutes',
+                    'Number of Pickpus w/o App Usage',
+                    'Name',
+                    'Local User Device State',
+                    'Given Name',
+                    'Family Name',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -138,7 +198,8 @@ class ScreentimeAll (ab.AbstractArtifact):
 
         if version.parse(iOSversion) >= version.parse("13"):
             cursor = db.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zusageblock.zstartdate+978307200,'unixepoch'),
             zusagecounteditem.zbundleidentifier,
@@ -162,10 +223,12 @@ class ScreentimeAll (ab.AbstractArtifact):
             and zusageblock.zusage = zusage.z_pk
             and zusage.zuser = zcoreuser.z_pk
             and zusage.zdevice = zcoredevice.z_pk
-                """)
+                """
+            )
         else:
             cursor = db.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zusageblock.zstartdate+978307200,'unixepoch'),
             zusagecounteditem.zbundleidentifier,
@@ -182,7 +245,8 @@ class ScreentimeAll (ab.AbstractArtifact):
             and zusageblock.zusage == zusage.z_pk
             and zusage.zuser == zcoreuser.z_pk
             and zusage.zdevice == zcoredevice.z_pk
-            """)
+            """
+            )
 
         all_rows = cursor.fetchall()
         usageentries = len(all_rows)
@@ -191,12 +255,38 @@ class ScreentimeAll (ab.AbstractArtifact):
             if version.parse(iOSversion) >= version.parse("13"):
 
                 for row in all_rows:
-                    data_list.append((row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10]))
+                    data_list.append(
+                        (
+                            row[0],
+                            row[1],
+                            row[2],
+                            row[3],
+                            row[4],
+                            row[5],
+                            row[6],
+                            row[7],
+                            row[8],
+                            row[9],
+                            row[10],
+                        )
+                    )
 
                 report = ArtifactHtmlReport('Screentime Counted Items')
                 report.start_artifact_report(report_folder, 'Counted Items')
                 report.add_script()
-                data_headers = ('Hour','Bundle ID','Number of Notifications','Number of Pickups', 'First Pickup','Number of Pickups W/O App Usage','Name','Local User Device State','Platform','Given Name','Family Name')
+                data_headers = (
+                    'Hour',
+                    'Bundle ID',
+                    'Number of Notifications',
+                    'Number of Pickups',
+                    'First Pickup',
+                    'Number of Pickups W/O App Usage',
+                    'Name',
+                    'Local User Device State',
+                    'Platform',
+                    'Given Name',
+                    'Family Name',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -204,12 +294,36 @@ class ScreentimeAll (ab.AbstractArtifact):
                 tsv(report_folder, data_headers, data_list, tsvname)
             else:
                 for row in all_rows:
-                    data_list.append((row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9]))
+                    data_list.append(
+                        (
+                            row[0],
+                            row[1],
+                            row[2],
+                            row[3],
+                            row[4],
+                            row[5],
+                            row[6],
+                            row[7],
+                            row[8],
+                            row[9],
+                        )
+                    )
 
                 report = ArtifactHtmlReport('Screentime Counted Items')
                 report.start_artifact_report(report_folder, 'Counted Items')
                 report.add_script()
-                data_headers = ('Hour', 'Bundle ID', 'Number of Notifications', 'Number of Pickups', 'First Pickup', 'Number of Pickups W/O App Usage', 'Name', 'Local User Device State', 'Given Name', 'Family Name')
+                data_headers = (
+                    'Hour',
+                    'Bundle ID',
+                    'Number of Notifications',
+                    'Number of Pickups',
+                    'First Pickup',
+                    'Number of Pickups W/O App Usage',
+                    'Name',
+                    'Local User Device State',
+                    'Given Name',
+                    'Family Name',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -220,7 +334,8 @@ class ScreentimeAll (ab.AbstractArtifact):
 
         if version.parse(iOSversion) >= version.parse("13"):
             cursor = db.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             distinct
             datetime(zusageblock.zstartdate+978307200,'unixepoch'),
@@ -248,7 +363,8 @@ class ScreentimeAll (ab.AbstractArtifact):
             and  zusageblock.zusage == zusage.z_pk
             and  zusage.zuser == zcoreuser.z_pk
             and zusage.zdevice == zcoredevice.z_pk
-            """)
+            """
+            )
 
         all_rows = cursor.fetchall()
         usageentries = len(all_rows)
@@ -257,12 +373,42 @@ class ScreentimeAll (ab.AbstractArtifact):
             if version.parse(iOSversion) >= version.parse("13"):
 
                 for row in all_rows:
-                    data_list.append((row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12]))
+                    data_list.append(
+                        (
+                            row[0],
+                            row[1],
+                            row[2],
+                            row[3],
+                            row[4],
+                            row[5],
+                            row[6],
+                            row[7],
+                            row[8],
+                            row[9],
+                            row[10],
+                            row[11],
+                            row[12],
+                        )
+                    )
 
                 report = ArtifactHtmlReport('Screentime Generic by Hour')
                 report.start_artifact_report(report_folder, 'Generic by Hour')
                 report.add_script()
-                data_headers = ('Hour', 'Screentime in Seconds', 'Screentime in Minutes', 'Given Name', 'Family Name', 'Name', 'Platform', 'Local User Device State', 'Longest Session Start', 'Longest Session End', 'Last Event Date', 'Longest Session Time in Seconds', 'Longest Session Time in Minutes')
+                data_headers = (
+                    'Hour',
+                    'Screentime in Seconds',
+                    'Screentime in Minutes',
+                    'Given Name',
+                    'Family Name',
+                    'Name',
+                    'Platform',
+                    'Local User Device State',
+                    'Longest Session Start',
+                    'Longest Session End',
+                    'Last Event Date',
+                    'Longest Session Time in Seconds',
+                    'Longest Session Time in Minutes',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 

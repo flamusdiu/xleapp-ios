@@ -3,15 +3,15 @@ from html_report.artifact_report import ArtifactHtmlReport
 from helpers import timeline, tsv
 from helpers.db import open_sqlite_db_readonly
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class DataUsageA(ab.AbstractArtifact):
+class DataUsageA(ab.Artifact):
 
     _name = 'Data Usage'
     _search_dirs = '**/DataUsage.sqlite'
     _category = 'Data Usage'
-    _web_icon = Icon.WIFI
+    _web_icon = WebIcon.WIFI
 
     def __init__(self):
         super().__init__(self)

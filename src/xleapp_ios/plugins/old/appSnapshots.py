@@ -10,15 +10,15 @@ from helpers import is_platform_windows, tsv
 from helpers.parsers import ktxparser
 from PIL import Image
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class AppSnapShots(ab.AbstractArtifact):
+class AppSnapShots(ab.Artifact):
 
     _name = 'App Snap Shots'
     _search_dirs = ('**/Library/Caches/Snapshots/*', '**/SplashBoard/Snapshots/*')
     _category = 'Installed Apps'
-    _web_icon = Icon.PACKAGE
+    _web_icon = WebIcon.PACKAGE
 
     def __init__(self):
         super().__init__(self)

@@ -7,15 +7,15 @@ from html_report.artifact_report import ArtifactHtmlReport
 from helpers import tsv
 from helpers.db import open_sqlite_db_readonly
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class CloudKitNotSharing(ab.AbstractArtifact):
+class CloudKitNotSharing(ab.Artifact):
 
     _name = 'CloudKit Note Sharing'
     _search_dirs = '*NoteStore.sqlite*'
     _category = 'CloudKit'
-    _web_icon = Icon.SHARE_2
+    _web_icon = WebIcon.SHARE_2
 
     def __init__(self):
         super().__init__(self)

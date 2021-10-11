@@ -7,17 +7,16 @@ from pathlib import Path
 
 from html_report.artifact_report import ArtifactHtmlReport
 from packaging import version
-from helpers import(is_platform_windows,
-                             open_sqlite_db_readonly, timeline, tsv)
+from helpers import is_platform_windows, open_sqlite_db_readonly, timeline, tsv
 
 import artifacts.artGlobals
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class PowerLogGZ (ab.AbstractArtifact):
+class PowerLogGZ(ab.Artifact):
     _name = 'Power Log GZ'
-    _search_dirs = ('**/Library/BatteryLife/Archives/powerlog_*.PLSQL.gz')
+    _search_dirs = '**/Library/BatteryLife/Archives/powerlog_*.PLSQL.gz'
     _category = "Power Log Backups"
 
     def get(self, files_found, seeker):
@@ -45,7 +44,7 @@ class PowerLogGZ (ab.AbstractArtifact):
         for file_found in files_found:
             file_found = str(file_found)
             filename = Path(file_found)
-            ungzipedfile= Path(filename.parent,filename.stem)
+            ungzipedfile = Path(filename.parent, filename.stem)
             with gzip.open(file_found, 'rb') as f_in:
                 with open(ungzipedfile, 'wb') as f_out:
                     shutil.copyfileobj(f_in, f_out)
@@ -57,7 +56,8 @@ class PowerLogGZ (ab.AbstractArtifact):
                     cursor = db.cursor()
 
                 if version.parse(iOSversion) >= version.parse("9"):
-                    cursor.execute("""
+                    cursor.execute(
+                        """
                     select
                     datetime(timestamp, 'unixepoch'),
                     datetime(timestamplogged, 'unixepoch'),
@@ -70,18 +70,32 @@ class PowerLogGZ (ab.AbstractArtifact):
                     pid
                     from
                     plaudioagent_eventpoint_audioapp
-                    """)
+                    """
+                    )
 
                     all_rows = cursor.fetchall()
                     usageentries = len(all_rows)
                     if usageentries > 0:
                         for row in all_rows:
-                            data_list1.append((row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8]))
+                            data_list1.append(
+                                (
+                                    row[0],
+                                    row[1],
+                                    row[2],
+                                    row[3],
+                                    row[4],
+                                    row[5],
+                                    row[6],
+                                    row[7],
+                                    row[8],
+                                )
+                            )
                     else:
                         logfunc('No data available in Powerlog Audio Routing via app')
 
                 if version.parse(iOSversion) >= version.parse("10"):
-                    cursor.execute("""
+                    cursor.execute(
+                        """
                     select
                     datetime(timestamp, 'unixepoch'),
                     bulletinbundleid,
@@ -90,17 +104,19 @@ class PowerLogGZ (ab.AbstractArtifact):
                     posttype
                     from
                     plspringboardagent_aggregate_sbbulletins_aggregate
-                    """)
+                    """
+                    )
                     all_rows = cursor.fetchall()
                     usageentries = len(all_rows)
                     if usageentries > 0:
                         for row in all_rows:
-                            data_list2.append((row[0],row[1],row[2],row[3],row[4]))
+                            data_list2.append((row[0], row[1], row[2], row[3], row[4]))
                     else:
                         logfunc('No data available in Aggregate Bulletins')
 
                 if version.parse(iOSversion) >= version.parse("10"):
-                        cursor.execute("""
+                    cursor.execute(
+                        """
                         select
                         datetime(timestamp, 'unixepoch'),
                         notificationbundleid,
@@ -108,18 +124,20 @@ class PowerLogGZ (ab.AbstractArtifact):
                         notificationtype
                         from
                         plspringboardagent_aggregate_sbnotifications_aggregate
-                        """)
-                        all_rows = cursor.fetchall()
-                        usageentries = len(all_rows)
-                        if usageentries > 0:
+                        """
+                    )
+                    all_rows = cursor.fetchall()
+                    usageentries = len(all_rows)
+                    if usageentries > 0:
 
-                            for row in all_rows:
-                                data_list3.append((row[0],row[1],row[2],row[3]))
-                        else:
-                            logfunc('No data available in Aggregate Notifications')
+                        for row in all_rows:
+                            data_list3.append((row[0], row[1], row[2], row[3]))
+                    else:
+                        logfunc('No data available in Aggregate Notifications')
 
             if version.parse(iOSversion) >= version.parse("9"):
-                cursor.execute("""
+                cursor.execute(
+                    """
                 select
                 datetime(timestamp, 'unixepoch'),
                 appname,
@@ -134,18 +152,31 @@ class PowerLogGZ (ab.AbstractArtifact):
                 end
                 from
                 plapplicationagent_eventnone_allapps
-                """)
+                """
+                )
 
                 all_rows = cursor.fetchall()
                 usageentries = len(all_rows)
                 if usageentries > 0:
                     for row in all_rows:
-                        data_list5.append((row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7]))
+                        data_list5.append(
+                            (
+                                row[0],
+                                row[1],
+                                row[2],
+                                row[3],
+                                row[4],
+                                row[5],
+                                row[6],
+                                row[7],
+                            )
+                        )
                 else:
                     logfunc('No data available in Powerlog App Info')
 
             if version.parse(iOSversion) >= version.parse("11"):
-                cursor.execute("""
+                cursor.execute(
+                    """
                 select
                 datetime(timestamp, 'unixepoch'),
                 datetime(start, 'unixepoch'),
@@ -155,18 +186,22 @@ class PowerLogGZ (ab.AbstractArtifact):
                 haserror
                 from
                 plxpcagent_eventpoint_mobilebackupevents
-                """)
+                """
+                )
 
                 all_rows = cursor.fetchall()
                 usageentries = len(all_rows)
                 if usageentries > 0:
                     for row in all_rows:
-                        data_list6.append((row[0],row[1],row[2],row[3],row[4],row[5]))
+                        data_list6.append(
+                            (row[0], row[1], row[2], row[3], row[4], row[5])
+                        )
                 else:
                     logfunc('No data available in Powerlog Backup Info')
 
             if version.parse(iOSversion) >= version.parse("11"):
-                cursor.execute("""
+                cursor.execute(
+                    """
                 select
                 datetime(appdeleteddate, 'unixepoch'),
                 datetime(timestamp, 'unixepoch'),
@@ -179,15 +214,28 @@ class PowerLogGZ (ab.AbstractArtifact):
                 from
                 plapplicationagent_eventnone_allapps
                 where
-                appdeleteddate > 0			""")
+                appdeleteddate > 0			"""
+                )
                 all_rows = cursor.fetchall()
                 usageentries = len(all_rows)
                 if usageentries > 0:
                     for row in all_rows:
-                        data_list7.append((row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7]))
+                        data_list7.append(
+                            (
+                                row[0],
+                                row[1],
+                                row[2],
+                                row[3],
+                                row[4],
+                                row[5],
+                                row[6],
+                                row[7],
+                            )
+                        )
 
             if version.parse(iOSversion) == version.parse("10"):
-                cursor.execute("""
+                cursor.execute(
+                    """
                 select
                 datetime(appdeleteddate, 'unixepoch'),
                 datetime(timestamp, 'unixepoch'),
@@ -200,15 +248,19 @@ class PowerLogGZ (ab.AbstractArtifact):
                 plapplicationagent_eventnone_allapps
                 where
                 appdeleteddate > 0
-                """)
+                """
+                )
                 iall_rows = cursor.fetchall()
                 usageentries = len(all_rows)
                 if usageentries > 0:
                     for row in all_rows:
-                        data_list7.append((row[0],row[1],row[2],row[3],row[4],row[5],row[6]))
+                        data_list7.append(
+                            (row[0], row[1], row[2], row[3], row[4], row[5], row[6])
+                        )
 
             if version.parse(iOSversion) == version.parse("9"):
-                cursor.execute("""
+                cursor.execute(
+                    """
                 select
                 datetime(appdeleteddate, 'unixepoch'),
                 datetime(timestamp, 'unixepoch'),
@@ -218,15 +270,17 @@ class PowerLogGZ (ab.AbstractArtifact):
                 plapplicationagent_eventnone_allapps
                 where
                 appdeleteddate > 0
-                """)
+                """
+                )
                 all_rows = cursor.fetchall()
                 usageentries = len(all_rows)
                 if usageentries > 0:
                     for row in all_rows:
-                        data_list7.append((row[0],row[1],row[2],row[3]))
+                        data_list7.append((row[0], row[1], row[2], row[3]))
 
             if version.parse(iOSversion) >= version.parse("10"):
-                cursor.execute("""
+                cursor.execute(
+                    """
                 select
                 datetime(timestamp, 'unixepoch'),
                 build,
@@ -235,29 +289,33 @@ class PowerLogGZ (ab.AbstractArtifact):
                 pairingid
                 from
                 plconfigagent_eventnone_paireddeviceconfig
-                """)
+                """
+                )
             else:
-                cursor.execute("""
+                cursor.execute(
+                    """
                 select
                 datetime(timestamp, 'unixepoch'),
                 build,
                 device
                 from
                 plconfigagent_eventnone_paireddeviceconfig
-                """)
+                """
+                )
 
             all_rows = cursor.fetchall()
             usageentries = len(all_rows)
             if usageentries > 0:
                 if version.parse(iOSversion) >= version.parse("10"):
                     for row in all_rows:
-                        data_list11.append((row[0],row[1],row[2],row[3],row[4]))
+                        data_list11.append((row[0], row[1], row[2], row[3], row[4]))
                 else:
                     for row in all_rows:
-                        data_list11.append((row[0],row[1],row[2]))
+                        data_list11.append((row[0], row[1], row[2]))
 
             if version.parse(iOSversion) >= version.parse("9"):
-                cursor.execute("""
+                cursor.execute(
+                    """
                 select
                 datetime(tts + system, 'unixepoch'),
                 bundleid,
@@ -298,15 +356,19 @@ class PowerLogGZ (ab.AbstractArtifact):
                 group by
                 torchid
                 )
-                """)
+                """
+                )
                 all_rows = cursor.fetchall()
                 usageentries = len(all_rows)
                 if usageentries > 0:
                     for row in all_rows:
-                        data_list15.append((row[0],row[1],row[2],row[3],row[4],row[5]))
+                        data_list15.append(
+                            (row[0], row[1], row[2], row[3], row[4], row[5])
+                        )
 
             if version.parse(iOSversion) >= version.parse("9"):
-                cursor.execute("""
+                cursor.execute(
+                    """
                 select
                 datetime(wifipropts + system, 'unixepoch') ,
                 currentssid,
@@ -342,20 +404,30 @@ class PowerLogGZ (ab.AbstractArtifact):
                 group by
                 wifiorotsid
                 )
-                """)
+                """
+                )
                 all_rows = cursor.fetchall()
                 usageentries = len(all_rows)
                 if usageentries > 0:
                     for row in all_rows:
-                        data_list18.append((row[0],row[1],row[2],row[3],row[4]))
-
+                        data_list18.append((row[0], row[1], row[2], row[3], row[4]))
 
         if version.parse(iOSversion) >= version.parse("9"):
             if len(data_list1) > 0:
                 report = ArtifactHtmlReport('Powerlog Audio Routing via App')
                 report.start_artifact_report(report_folder, 'Audio Routing')
                 report.add_script()
-                data_headers1 = ('Timestamp','Timestamped Logged','Bundle ID','Assertion Name','Audio Route','Mirroring State','Operation','PID', 'Audio App Table ID' )
+                data_headers1 = (
+                    'Timestamp',
+                    'Timestamped Logged',
+                    'Bundle ID',
+                    'Assertion Name',
+                    'Audio Route',
+                    'Mirroring State',
+                    'Operation',
+                    'PID',
+                    'Audio App Table ID',
+                )
                 report.write_artifact_data_table(data_headers1, data_list1, file_found)
                 report.end_artifact_report()
 
@@ -370,7 +442,13 @@ class PowerLogGZ (ab.AbstractArtifact):
                 report = ArtifactHtmlReport('Powerlog Aggregate Bulletins')
                 report.start_artifact_report(report_folder, 'Aggregate Bulletins')
                 report.add_script()
-                data_headers2 = ('Timestamp','Bulletin Bundle ID','Time Interval in Seconds','Count','Post Type')
+                data_headers2 = (
+                    'Timestamp',
+                    'Bulletin Bundle ID',
+                    'Time Interval in Seconds',
+                    'Count',
+                    'Post Type',
+                )
                 report.write_artifact_data_table(data_headers2, data_list2, file_found)
                 report.end_artifact_report()
 
@@ -385,7 +463,12 @@ class PowerLogGZ (ab.AbstractArtifact):
                 report = ArtifactHtmlReport('Powerlog Aggregate Notifications')
                 report.start_artifact_report(report_folder, 'Aggregate Notifications')
                 report.add_script()
-                data_headers3 = ('Timestamp','Notification Bundle ID','Count','Notification Type')
+                data_headers3 = (
+                    'Timestamp',
+                    'Notification Bundle ID',
+                    'Count',
+                    'Notification Type',
+                )
                 report.write_artifact_data_table(data_headers3, data_list3, file_found)
                 report.end_artifact_report()
 
@@ -400,7 +483,16 @@ class PowerLogGZ (ab.AbstractArtifact):
                 report = ArtifactHtmlReport('Powerlog App Info')
                 report.start_artifact_report(report_folder, 'App Info')
                 report.add_script()
-                data_headers5 = ('Timestamp','App Name','App Executable Name','Bundle ID','App Build Version','App Bundle Version','App TYpe','App Deleted Date')
+                data_headers5 = (
+                    'Timestamp',
+                    'App Name',
+                    'App Executable Name',
+                    'Bundle ID',
+                    'App Build Version',
+                    'App Bundle Version',
+                    'App TYpe',
+                    'App Deleted Date',
+                )
                 report.write_artifact_data_table(data_headers5, data_list5, file_found)
                 report.end_artifact_report()
 
@@ -415,7 +507,14 @@ class PowerLogGZ (ab.AbstractArtifact):
                 report = ArtifactHtmlReport('Powerlog Backup Info')
                 report.start_artifact_report(report_folder, 'Backup Info')
                 report.add_script()
-                data_headers6 = ('Timestamp','Start','End','State','Finished','Has error' )
+                data_headers6 = (
+                    'Timestamp',
+                    'Start',
+                    'End',
+                    'State',
+                    'Finished',
+                    'Has error',
+                )
                 report.write_artifact_data_table(data_headers6, data_list6, file_found)
                 report.end_artifact_report()
 
@@ -430,7 +529,16 @@ class PowerLogGZ (ab.AbstractArtifact):
                 report = ArtifactHtmlReport('Powerlog Deleted Apps')
                 report.start_artifact_report(report_folder, 'Deleted Apps')
                 report.add_script()
-                data_headers7 = ('App Deleted Date','Timestamp','App Name','App Executable Name','Bundle ID','App Build Version','App Bundle Version','App Type')
+                data_headers7 = (
+                    'App Deleted Date',
+                    'Timestamp',
+                    'App Name',
+                    'App Executable Name',
+                    'Bundle ID',
+                    'App Build Version',
+                    'App Bundle Version',
+                    'App Type',
+                )
                 report.write_artifact_data_table(data_headers7, data_list7, file_found)
                 report.end_artifact_report()
 
@@ -445,7 +553,15 @@ class PowerLogGZ (ab.AbstractArtifact):
                 report = ArtifactHtmlReport('Powerlog Deleted Apps')
                 report.start_artifact_report(report_folder, 'Deleted Apps')
                 report.add_script()
-                data_headers7 = ('App Deleted Date','Timestamp','App Name','App Executable Name','Bundle ID','App Build Version','App Bundle Version')
+                data_headers7 = (
+                    'App Deleted Date',
+                    'Timestamp',
+                    'App Name',
+                    'App Executable Name',
+                    'Bundle ID',
+                    'App Build Version',
+                    'App Bundle Version',
+                )
                 report.write_artifact_data_table(data_headers7, data_list7, file_found)
                 report.end_artifact_report()
 
@@ -460,7 +576,12 @@ class PowerLogGZ (ab.AbstractArtifact):
                 report = ArtifactHtmlReport('Powerlog Deleted Apps')
                 report.start_artifact_report(report_folder, 'Deleted Apps')
                 report.add_script()
-                data_headers7 = ('App Deleted Date','Timestamp','App Name','Bundle ID')
+                data_headers7 = (
+                    'App Deleted Date',
+                    'Timestamp',
+                    'App Name',
+                    'Bundle ID',
+                )
                 report.write_artifact_data_table(data_headers7, data_list7, file_found)
                 report.end_artifact_report()
 
@@ -473,10 +594,20 @@ class PowerLogGZ (ab.AbstractArtifact):
         if version.parse(iOSversion) >= version.parse("10"):
             if len(data_list11) > 0:
                 report = ArtifactHtmlReport('Powerlog Paired Device Configuration')
-                report.start_artifact_report(report_folder, 'Paired Device Configuration')
+                report.start_artifact_report(
+                    report_folder, 'Paired Device Configuration'
+                )
                 report.add_script()
-                data_headers11 = ('Timestamp','Build','Device','HW Model','Pairing ID')
-                report.write_artifact_data_table(data_headers11, data_list11, file_found)
+                data_headers11 = (
+                    'Timestamp',
+                    'Build',
+                    'Device',
+                    'HW Model',
+                    'Pairing ID',
+                )
+                report.write_artifact_data_table(
+                    data_headers11, data_list11, file_found
+                )
                 report.end_artifact_report()
 
                 tsvname = 'Powerlog Paired Device Conf from GZ backup'
@@ -487,10 +618,14 @@ class PowerLogGZ (ab.AbstractArtifact):
         else:
             if len(data_list11) > 0:
                 report = ArtifactHtmlReport('Powerlog Paired Device Configuration')
-                report.start_artifact_report(report_folder, 'Paired Device Configuration')
+                report.start_artifact_report(
+                    report_folder, 'Paired Device Configuration'
+                )
                 report.add_script()
-                data_headers11 = ('Timestamp','Build','Device' )
-                report.write_artifact_data_table(data_headers11, data_list11, file_found)
+                data_headers11 = ('Timestamp', 'Build', 'Device')
+                report.write_artifact_data_table(
+                    data_headers11, data_list11, file_found
+                )
                 report.end_artifact_report()
 
                 tsvname = 'Powerlog Paired Device Conf from GZ backup'
@@ -504,8 +639,17 @@ class PowerLogGZ (ab.AbstractArtifact):
                 report = ArtifactHtmlReport('Powerlog Torch')
                 report.start_artifact_report(report_folder, 'Torch')
                 report.add_script()
-                data_headers15 = ('Adjusted Timestamp','Bundle ID','Status','Original Torch Timestamp','Offset Timestamp','Time Offset')
-                report.write_artifact_data_table(data_headers15, data_list15, file_found)
+                data_headers15 = (
+                    'Adjusted Timestamp',
+                    'Bundle ID',
+                    'Status',
+                    'Original Torch Timestamp',
+                    'Offset Timestamp',
+                    'Time Offset',
+                )
+                report.write_artifact_data_table(
+                    data_headers15, data_list15, file_found
+                )
                 report.end_artifact_report()
 
                 tsvname = 'Powerlog Torch from GZ backup'
@@ -514,14 +658,21 @@ class PowerLogGZ (ab.AbstractArtifact):
                 tlactivity = 'Powerlog Torch from GZ backup'
                 timeline(report_folder, tlactivity, data_list15, data_headers15)
 
-
         if version.parse(iOSversion) >= version.parse("9"):
             if len(data_list18) > 0:
                 report = ArtifactHtmlReport('Powerlog WiFi Network Connections')
                 report.start_artifact_report(report_folder, 'WiFi Network Connections')
                 report.add_script()
-                data_headers18 = ('Adjusted Timestamp','Current SSID','Current Channel','Offset Timestamp','Time Offset')
-                report.write_artifact_data_table(data_headers18, data_list18, file_found)
+                data_headers18 = (
+                    'Adjusted Timestamp',
+                    'Current SSID',
+                    'Current Channel',
+                    'Offset Timestamp',
+                    'Time Offset',
+                )
+                report.write_artifact_data_table(
+                    data_headers18, data_list18, file_found
+                )
                 report.end_artifact_report()
 
                 tsvname = 'Powerlog Wifi Network Connections from GZ backup'

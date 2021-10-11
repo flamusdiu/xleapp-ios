@@ -9,10 +9,10 @@ import zlib
 from html_report.artifact_report import ArtifactHtmlReport
 from helpers import open_sqlite_db_readonly, timeline, tsv
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class GeodMapTiles(ab.AbstractArtifact):
+class GeodMapTiles(ab.Artifact):
 
     _name = 'GeoD Map Tiles'
     _search_dirs = '**/MapTiles.sqlitedb'

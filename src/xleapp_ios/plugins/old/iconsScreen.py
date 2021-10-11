@@ -3,15 +3,15 @@ import plistlib
 import sqlite3
 
 from html_report.artifact_report import ArtifactHtmlReport
-from helpers import is_platform_windows,  logfunc
+from helpers import is_platform_windows, logfunc
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class IconsScreen(ab.AbstractArtifact):
+class IconsScreen(ab.Artifact):
 
     _name = 'Apps per screen'
-    _search_dirs = ('**/SpringBoard/IconState.plist')
+    _search_dirs = '**/SpringBoard/IconState.plist'
     _category = 'iOS Screens'
 
     def get(self, files_found, seeker):
@@ -28,7 +28,7 @@ class IconsScreen(ab.AbstractArtifact):
 
             for x in range(0, len(icon)):
                 page = icon[x]
-                htmlstring = (f"<table><tr>")
+                htmlstring = f"<table><tr>"
                 htmlstring = htmlstring + (f'<td colspan="4"> Icons screen #{x}</td>')
                 for y in range(0, len(page)):
                     rows = page[y]
@@ -38,7 +38,7 @@ class IconsScreen(ab.AbstractArtifact):
                     if isinstance(rows, dict):
                         var = rows
                         foldername = var['displayName']
-                        rows = (f'Folder: {foldername}')
+                        rows = f'Folder: {foldername}'
                         bundlesinfolder = var['iconLists'][0]
                         for items in bundlesinfolder:
                             rows = rows + '<br>' + items
@@ -48,10 +48,10 @@ class IconsScreen(ab.AbstractArtifact):
                 data_list.append((htmlstring,))
 
             htmlstring = ''
-            htmlstring = (f'<table><tr> <td colspan="4"> Icons bottom bar</td></tr><tr>')
+            htmlstring = f'<table><tr> <td colspan="4"> Icons bottom bar</td></tr><tr>'
             for x in range(0, len(bbar)):
-                htmlstring = htmlstring +(f"<td width = 25%>{bbar[x]}</td>")
-            htmlstring = htmlstring +("</tr></table>")
+                htmlstring = htmlstring + (f"<td width = 25%>{bbar[x]}</td>")
+            htmlstring = htmlstring + ("</tr></table>")
             data_list.append((htmlstring,))
 
             logfunc("Screens: " + str(len(icon)))
@@ -59,6 +59,8 @@ class IconsScreen(ab.AbstractArtifact):
             report = ArtifactHtmlReport(f'Apps per screen')
             report.start_artifact_report(report_folder, f'Apps per screen')
             report.add_script()
-            data_headers = ((f'Apps per Screens',))
-            report.write_artifact_data_table(data_headers, data_list, file_found, html_escape=False)
+            data_headers = (f'Apps per Screens',)
+            report.write_artifact_data_table(
+                data_headers, data_list, file_found, html_escape=False
+            )
             report.end_artifact_report()

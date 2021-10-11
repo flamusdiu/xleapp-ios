@@ -4,23 +4,25 @@ import sqlite3
 
 from html_report.artifact_report import ArtifactHtmlReport
 from packaging import version
-from helpers import(is_platform_windows, kmlgen,
-                             open_sqlite_db_readonly, timeline, tsv)
+from helpers import is_platform_windows, kmlgen, open_sqlite_db_readonly, timeline, tsv
 
 import artifacts.artGlobals
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class RoutineDLocations(ab.AbstractArtifact):
+class RoutineDLocations(ab.Artifact):
     _name = 'RoutineD ZRTCLLOCATIONMO'
-    _search_dirs = ('**/com.apple.routined/Cache.sqlite*')
+    _search_dirs = '**/com.apple.routined/Cache.sqlite*'
     _category = 'Locations'
 
     def get(self, files_found, seeker):
         iOSversion = artifacts.artGlobals.versionf
         if version.parse(iOSversion) < version.parse("10"):
-            logfunc("Unsupported version for RoutineD Locations Cache.sqlite on iOS " + iOSversion)
+            logfunc(
+                "Unsupported version for RoutineD Locations Cache.sqlite on iOS "
+                + iOSversion
+            )
         else:
             for file_found in files_found:
                 file_found = str(file_found)
@@ -30,7 +32,8 @@ class RoutineDLocations(ab.AbstractArtifact):
 
             db = open_sqlite_db_readonly(file_found)
             cursor = db.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(ztimestamp + 978307200, 'unixepoch'),
             zaltitude,
@@ -44,20 +47,47 @@ class RoutineDLocations(ab.AbstractArtifact):
             zlongitude
             from
             zrtcllocationmo
-            """)
+            """
+            )
 
             all_rows = cursor.fetchall()
             usageentries = len(all_rows)
             data_list = []
             if usageentries > 0:
                 for row in all_rows:
-                    data_list.append((row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9]))
+                    data_list.append(
+                        (
+                            row[0],
+                            row[1],
+                            row[2],
+                            row[3],
+                            row[4],
+                            row[5],
+                            row[6],
+                            row[7],
+                            row[8],
+                            row[9],
+                        )
+                    )
 
                 description = 'Granular location data (~ 1 week)'
                 report = ArtifactHtmlReport('Locations')
-                report.start_artifact_report(report_folder, 'RoutineD ZRTCLLOCATIONMO', description)
+                report.start_artifact_report(
+                    report_folder, 'RoutineD ZRTCLLOCATIONMO', description
+                )
                 report.add_script()
-                data_headers = ('Timestamp','Altitude','Course','Speed (M/S)', 'Speed (MPH)','Speed (KMPH)','Horizontal Accuracy','Vertical Accuracy','Latitude','Longitude' )
+                data_headers = (
+                    'Timestamp',
+                    'Altitude',
+                    'Course',
+                    'Speed (M/S)',
+                    'Speed (MPH)',
+                    'Speed (KMPH)',
+                    'Horizontal Accuracy',
+                    'Vertical Accuracy',
+                    'Latitude',
+                    'Longitude',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -73,7 +103,8 @@ class RoutineDLocations(ab.AbstractArtifact):
             else:
                 logfunc('No RoutineD ZRTCLLOCATIONMO data available')
 
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zdate + 978307200, 'unixepoch'),
             zsource,
@@ -81,7 +112,8 @@ class RoutineDLocations(ab.AbstractArtifact):
             zlongitude
             from
             zrthintmo
-            """)
+            """
+            )
 
             all_rows = cursor.fetchall()
             usageentries = len(all_rows)
@@ -92,9 +124,11 @@ class RoutineDLocations(ab.AbstractArtifact):
 
                 description = 'Semi-granular location data (~ 1 week)'
                 report = ArtifactHtmlReport('Locations')
-                report.start_artifact_report(report_folder, 'RoutineD ZRTHINTMO', description)
+                report.start_artifact_report(
+                    report_folder, 'RoutineD ZRTHINTMO', description
+                )
                 report.add_script()
-                data_headers = ('Timestamp','Source','Latitude','Longitude' )
+                data_headers = ('Timestamp', 'Source', 'Latitude', 'Longitude')
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -110,8 +144,8 @@ class RoutineDLocations(ab.AbstractArtifact):
             else:
                 logfunc('No RoutineD ZRTHINTMO data available')
 
-
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zentrydate + 978307200, 'unixepoch'),
             datetime(zexitdate + 978307200, 'unixepoch'),
@@ -123,20 +157,34 @@ class RoutineDLocations(ab.AbstractArtifact):
             zlocationuncertainty
             from
             zrtvisitmo
-            """)
+            """
+            )
 
             all_rows = cursor.fetchall()
             usageentries = len(all_rows)
             data_list = []
             if usageentries > 0:
                 for row in all_rows:
-                    data_list.append((row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7]))
+                    data_list.append(
+                        (row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7])
+                    )
 
                 description = 'Visit locations'
                 report = ArtifactHtmlReport('Locations')
-                report.start_artifact_report(report_folder, 'RoutineD ZRTVISITMO', description)
+                report.start_artifact_report(
+                    report_folder, 'RoutineD ZRTVISITMO', description
+                )
                 report.add_script()
-                data_headers = ('Timestamp','Exit Timestamp','Detection Timestamp','Visit Time (Minutes)', 'Type','Latitude','Longitude','Uncertainty')
+                data_headers = (
+                    'Timestamp',
+                    'Exit Timestamp',
+                    'Detection Timestamp',
+                    'Visit Time (Minutes)',
+                    'Type',
+                    'Latitude',
+                    'Longitude',
+                    'Uncertainty',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -151,4 +199,3 @@ class RoutineDLocations(ab.AbstractArtifact):
 
             else:
                 logfunc('No RoutineD ZRTVISITMO data available')
-

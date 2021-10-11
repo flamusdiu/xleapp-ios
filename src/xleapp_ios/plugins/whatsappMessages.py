@@ -2,41 +2,36 @@ from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 
-from xleapp import globals as g
-from xleapp.artifacts.abstract import AbstractArtifact
-from xleapp.helpers.db import open_sqlite_db_readonly
-from xleapp.helpers.decorators import Search, timed
-from xleapp.report.html import copy_static_files
-from xleapp.report.webicons import Icon
+from xleapp import Artifact, Search, WebIcon, open_sqlite_db_readonly, timed
 
 
 @dataclass
-class WhatsappMessages(AbstractArtifact):
+class WhatsappMessages(Artifact):
     def __post_init__(self):
-        self.name = 'Whatsapp - Messages'
-        self.category = 'Whatsapp'
+        self.name = "Whatsapp - Messages"
+        self.category = "Whatsapp"
         self.report_headers = (
-            'Timestamp',
-            'Sender Name',
-            'From ID',
-            'Receiver',
-            'To ID',
-            'Message',
-            'Attachment File',
-            'Thumb',
-            'Attachment Local Path',
-            'Starred?',
-            'Latitude',
-            'Longitude',
+            "Timestamp",
+            "Sender Name",
+            "From ID",
+            "Receiver",
+            "To ID",
+            "Message",
+            "Attachment File",
+            "Thumb",
+            "Attachment Local Path",
+            "Starred?",
+            "Latitude",
+            "Longitude",
         )
-        self.web_icon = Icon.MESSAGE_SQUARE
+        self.web_icon = WebIcon.MESSAGE_SQUARE
         self.kml = True
         self.timeline = True
 
     @timed
     @Search(
-        '*/var/mobile/Containers/Shared/AppGroup/*/ChatStorage.sqlite*',
-        '*/var/mobile/Containers/Shared/AppGroup/*/Message/Media/*/*/*/*.*',
+        "*/var/mobile/Containers/Shared/AppGroup/*/ChatStorage.sqlite*",
+        "*/var/mobile/Containers/Shared/AppGroup/*/Message/Media/*/*/*/*.*",
         file_names_only=True,
         return_on_first_hit=False,
     )
@@ -45,18 +40,18 @@ class WhatsappMessages(AbstractArtifact):
         media_list = defaultdict(set)
         files_found = self.found.copy()
         for file_found in files_found:
-            if not file_found.suffix.startswith('.sqlite'):
-                media_list[file_found.stem].add(file_found)
+            if not file_found().suffix.startswith(".sqlite"):
+                media_list[file_found().stem].add(file_found())
                 self.found.remove(file_found)
 
-            if file_found.name.endswith('.sqlite'):
-                fp = str(file_found)
+            if file_found().name.endswith(".sqlite"):
+                fp = str(file_found())
 
         db = open_sqlite_db_readonly(fp)
         cursor = db.cursor()
 
         cursor.execute(
-            '''
+            """
             select
             datetime(ZMESSAGEDATE+978307200, 'UNIXEPOCH'),
             ZISFROMME,
@@ -76,7 +71,7 @@ class WhatsappMessages(AbstractArtifact):
             on ZWAMESSAGE.Z_PK = ZWAMEDIAITEM.ZMESSAGE 
             left JOIN ZWACHATSESSION
             on ZWACHATSESSION.Z_PK = ZWAMESSAGE.ZCHATSESSION
-            '''
+            """
         )
         all_rows = cursor.fetchall()
         usageentries = len(all_rows)
@@ -85,18 +80,18 @@ class WhatsappMessages(AbstractArtifact):
             for row in all_rows:
 
                 if row[1] == 1:
-                    sender = 'Local User'
+                    sender = "Local User"
                     receiver = row[2]
                 else:
                     sender = row[2]
-                    receiver = 'Local User'
+                    receiver = "Local User"
 
                 if row[8] == 5:
                     lon = row[9]
                     lat = row[10]
                 else:
-                    lat = ''
-                    lon = ''
+                    lat = ""
+                    lon = ""
 
                 thumb = row[12]
                 attachment = row[11]
@@ -108,15 +103,13 @@ class WhatsappMessages(AbstractArtifact):
                     media_base_path = media_list[media_base_name].pop().parent
 
                     try:
-                        thumb_path = media_base_path / f'{media_name}'
-                        url_src_path = (
-                            copy_static_files(thumb_path, "images") / media_name
-                        )
+                        thumb_path = media_base_path / f"{media_name}"
+                        url_src_path = self.copyfile(thumb_path, media_name)
                         thumb = f'<img src="{url_src_path}"></img>'
-                    except:
-                        thumb = ''
+                    except FileNotFoundError:
+                        thumb = ""
                 else:
-                    thumb = ''
+                    thumb = ""
 
                 if attachment and Path(attachment).stem in media_list:
                     media_name = Path(attachment).name
@@ -124,15 +117,13 @@ class WhatsappMessages(AbstractArtifact):
                     media_base_path = media_list[media_base_name].pop().parent
 
                     try:
-                        attachment_path = media_base_path / f'{media_name}'
-                        url_src_path = (
-                            copy_static_files(attachment_path, "images") / media_name
-                        )
+                        attachment_path = media_base_path / f"{media_name}"
+                        url_src_path = self.copyfile(attachment_path, media_name)
                         attachment = f'<img src="{url_src_path}" width="300"></img>'
-                    except:
-                        attachment = ''
+                    except FileNotFoundError:
+                        attachment = ""
                 else:
-                    attachment = ''
+                    attachment = ""
 
                 data_list.append(
                     (

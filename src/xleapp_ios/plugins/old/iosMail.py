@@ -7,13 +7,13 @@ from helpers import timeline, tsv
 
 import artifacts.artGlobals
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class IOSMail(ab.AbstractArtifact):
+class IOSMail(ab.Artifact):
 
     _name = 'IOS Mail'
-    _search_dirs = ('**/private/var/mobile/Library/Mail/* Index*')
+    _search_dirs = '**/private/var/mobile/Library/Mail/* Index*'
     _category = 'Emails'
 
     def get(self, files_found, seeker):
@@ -144,14 +144,38 @@ class IOSMail(ab.AbstractArtifact):
             if usageentries > 0:
                 data_list = []
                 for row in all_rows:
-                    data_list.append((row[1], row[2], row[3], row[4], row[5], row[6], row[9], row[7], row[8], row[0]))
+                    data_list.append(
+                        (
+                            row[1],
+                            row[2],
+                            row[3],
+                            row[4],
+                            row[5],
+                            row[6],
+                            row[9],
+                            row[7],
+                            row[8],
+                            row[0],
+                        )
+                    )
 
                 file_found = head
                 description = ''
                 report = ArtifactHtmlReport('iOS Mail')
                 report.start_artifact_report(report_folder, 'Emails', description)
                 report.add_script()
-                data_headers = ('Date Sent', 'Date Received', 'Sender', 'Message ID', 'Subject', 'Recipient', 'Message', 'CC', 'BCC','Row ID')
+                data_headers = (
+                    'Date Sent',
+                    'Date Received',
+                    'Sender',
+                    'Message ID',
+                    'Subject',
+                    'Recipient',
+                    'Message',
+                    'CC',
+                    'BCC',
+                    'Row ID',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -196,14 +220,38 @@ class IOSMail(ab.AbstractArtifact):
             if usageentries > 0:
                 data_list = []
                 for row in all_rows:
-                    data_list.append((row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9]))
+                    data_list.append(
+                        (
+                            row[0],
+                            row[1],
+                            row[2],
+                            row[3],
+                            row[4],
+                            row[5],
+                            row[6],
+                            row[7],
+                            row[8],
+                            row[9],
+                        )
+                    )
 
                 file_found = head
                 description = ''
                 report = ArtifactHtmlReport('iOS Mail')
                 report.start_artifact_report(report_folder, 'Emails', description)
                 report.add_script()
-                data_headers = ('Date Sent', 'Date Received', 'Address', 'Comment', 'Subject', 'Summary', 'Read?', 'Flagged?', 'Deleted', 'Mailbox')
+                data_headers = (
+                    'Date Sent',
+                    'Date Received',
+                    'Address',
+                    'Comment',
+                    'Subject',
+                    'Summary',
+                    'Read?',
+                    'Flagged?',
+                    'Deleted',
+                    'Mailbox',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 

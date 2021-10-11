@@ -8,14 +8,14 @@ import textwrap
 from html import escape
 
 from html_report.artifact_report import ArtifactHtmlReport
-from helpers import is_platform_windows,  timeline, tsv
+from helpers import is_platform_windows, timeline, tsv
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class MobileInstall(ab.AbstractArtifact):
+class MobileInstall(ab.Artifact):
     _name = 'Mobile Installation Logs'
-    _search_dirs = ('**/mobile_installation.log.*')
+    _search_dirs = '**/mobile_installation.log.*'
     _category = 'Mobile Installation Logs'
 
     def get(self, files_found, seeker):
@@ -65,14 +65,22 @@ class MobileInstall(ab.AbstractArtifact):
                     elif matchObj4:
                         bundleid = matchObj4.group(1)
 
-                    matchObj = re.search(r"(?<=^)(.*)(?= \[)", line)  # Regex for timestamp
+                    matchObj = re.search(
+                        r"(?<=^)(.*)(?= \[)", line
+                    )  # Regex for timestamp
                     if matchObj:
                         timestamp = matchObj.group(1)
                         weekday, month, day, time, year = str.split(timestamp)
                         day = day_converter(day)
                         month = month_converter(month)
                         inserttime = (
-                                str(year) + "-" + str(month) + "-" + str(day) + " " + str(time)
+                            str(year)
+                            + "-"
+                            + str(month)
+                            + "-"
+                            + str(day)
+                            + " "
+                            + str(time)
                         )
                         # logfunc(inserttime)
                         # logfunc(month)
@@ -115,14 +123,22 @@ class MobileInstall(ab.AbstractArtifact):
                         bundleid = matchObj.group(1)
                         # logfunc ("Bundle ID: ", bundleid )
 
-                    matchObj = re.search(r"(?<=^)(.*)(?= \[)", line)  # Regex for timestamp
+                    matchObj = re.search(
+                        r"(?<=^)(.*)(?= \[)", line
+                    )  # Regex for timestamp
                     if matchObj:
                         timestamp = matchObj.group(1)
                         weekday, month, day, time, year = str.split(timestamp)
                         day = day_converter(day)
                         month = month_converter(month)
                         inserttime = (
-                                str(year) + "-" + str(month) + "-" + str(day) + " " + str(time)
+                            str(year)
+                            + "-"
+                            + str(month)
+                            + "-"
+                            + str(day)
+                            + " "
+                            + str(time)
                         )
                         # logfunc(inserttime)
                         # logfunc(month)
@@ -169,14 +185,22 @@ class MobileInstall(ab.AbstractArtifact):
                         bundleid = matchObj.group(1)
                         # logfunc ("Bundle ID: ", bundleid )
 
-                    matchObj = re.search(r"(?<=^)(.*)(?= \[)", line)  # Regex for timestamp
+                    matchObj = re.search(
+                        r"(?<=^)(.*)(?= \[)", line
+                    )  # Regex for timestamp
                     if matchObj:
                         timestamp = matchObj.group(1)
                         weekday, month, day, time, year = str.split(timestamp)
                         day = day_converter(day)
                         month = month_converter(month)
                         inserttime = (
-                                str(year) + "-" + str(month) + "-" + str(day) + " " + str(time)
+                            str(year)
+                            + "-"
+                            + str(month)
+                            + "-"
+                            + str(day)
+                            + " "
+                            + str(time)
                         )
                         # logfunc(inserttime)
                         # logfunc(month)
@@ -223,14 +247,22 @@ class MobileInstall(ab.AbstractArtifact):
                         bundleid = matchObj.group(1)
                         # logfunc ("Bundle ID: ", bundleid )
 
-                    matchObj = re.search(r"(?<=^)(.*)(?= \[)", line)  # Regex for timestamp
+                    matchObj = re.search(
+                        r"(?<=^)(.*)(?= \[)", line
+                    )  # Regex for timestamp
                     if matchObj:
                         timestamp = matchObj.group(1)
                         weekday, month, day, time, year = str.split(timestamp)
                         day = day_converter(day)
                         month = month_converter(month)
                         inserttime = (
-                                str(year) + "-" + str(month) + "-" + str(day) + " " + str(time)
+                            str(year)
+                            + "-"
+                            + str(month)
+                            + "-"
+                            + str(day)
+                            + " "
+                            + str(time)
                         )
                         # logfunc(inserttime)
                         # logfunc(month)
@@ -275,14 +307,22 @@ class MobileInstall(ab.AbstractArtifact):
                         bundleid = matchObj.group(1)
                         # logfunc ("Bundle ID: ", bundleid )
 
-                    matchObj = re.search(r"(?<=^)(.*)(?= \[)", line)  # Regex for timestamp
+                    matchObj = re.search(
+                        r"(?<=^)(.*)(?= \[)", line
+                    )  # Regex for timestamp
                     if matchObj:
                         timestamp = matchObj.group(1)
                         weekday, month, day, time, year = str.split(timestamp)
                         day = day_converter(day)
                         month = month_converter(month)
                         inserttime = (
-                                str(year) + "-" + str(month) + "-" + str(day) + " " + str(time)
+                            str(year)
+                            + "-"
+                            + str(month)
+                            + "-"
+                            + str(day)
+                            + " "
+                            + str(time)
                         )
                         # logfunc(inserttime)
                         # logfunc(month)
@@ -307,18 +347,28 @@ class MobileInstall(ab.AbstractArtifact):
 
                     tsv_tml_data_list.append((inserttime, actiondesc, bundleid, path))
 
-                matchObj = re.search(r"(main: Reboot detected)", line)  # Regex for reboots
+                matchObj = re.search(
+                    r"(main: Reboot detected)", line
+                )  # Regex for reboots
                 if matchObj:
                     actiondesc = "Reboot detected"
                     # logfunc(actiondesc)
-                    matchObj = re.search(r"(?<=^)(.*)(?= \[)", line)  # Regex for timestamp
+                    matchObj = re.search(
+                        r"(?<=^)(.*)(?= \[)", line
+                    )  # Regex for timestamp
                     if matchObj:
                         timestamp = matchObj.group(1)
                         weekday, month, day, time, year = str.split(timestamp)
                         day = day_converter(day)
                         month = month_converter(month)
                         inserttime = (
-                                str(year) + "-" + str(month) + "-" + str(day) + " " + str(time)
+                            str(year)
+                            + "-"
+                            + str(month)
+                            + "-"
+                            + str(day)
+                            + " "
+                            + str(time)
                         )
                         # logfunc(inserttime)
                         # logfunc(month)
@@ -357,14 +407,22 @@ class MobileInstall(ab.AbstractArtifact):
                         bundleid = matchObj.group(1)
                         # logfunc ("Bundle ID: ", bundleid )
 
-                    matchObj = re.search(r"(?<=^)(.*)(?= \[)", line)  # Regex for timestamp
+                    matchObj = re.search(
+                        r"(?<=^)(.*)(?= \[)", line
+                    )  # Regex for timestamp
                     if matchObj:
                         timestamp = matchObj.group(1)
                         weekday, month, day, time, year = str.split(timestamp)
                         day = day_converter(day)
                         month = month_converter(month)
                         inserttime = (
-                                str(year) + "-" + str(month) + "-" + str(day) + " " + str(time)
+                            str(year)
+                            + "-"
+                            + str(month)
+                            + "-"
+                            + str(day)
+                            + " "
+                            + str(time)
                         )
                         # logfunc(inserttime)
                         # logfunc(month)
@@ -437,18 +495,33 @@ class MobileInstall(ab.AbstractArtifact):
                     uninstallcount = uninstallcount + 1
                     totalapps = totalapps + 1
                     # tofile1 = row[0] + ' ' + row[1] + ' ' + row[2] + ' ' + row[3] + '\n'
-                    data_list_uninstalled.append((row[0], row[2],))
+                    data_list_uninstalled.append(
+                        (
+                            row[0],
+                            row[2],
+                        )
+                    )
                     # logfunc()
                 elif row[1] == "Uninstalling identifier":
                     # logfunc(row[0], row[1], row[2], row[3])
                     uninstallcount = uninstallcount + 1
                     totalapps = totalapps + 1
                     # tofile1 = row[0] + ' ' + row[1] + ' ' + row[2] + ' ' + row[3] + '\n'
-                    data_list_uninstalled.append((row[0], row[2],))
+                    data_list_uninstalled.append(
+                        (
+                            row[0],
+                            row[2],
+                        )
+                    )
                     # logfunc()
                 else:
                     # logfunc(row[0], row[1], row[2], row[3])
-                    data_list_installed.append((row[0], row[2],))
+                    data_list_installed.append(
+                        (
+                            row[0],
+                            row[2],
+                        )
+                    )
                     installedcount = installedcount + 1
                     totalapps = totalapps + 1
 
@@ -457,7 +530,10 @@ class MobileInstall(ab.AbstractArtifact):
         report = ArtifactHtmlReport('Apps - Uninstalled')
         report.start_artifact_report(report_folder, 'Apps - Uninstalled', description)
         report.add_script()
-        data_headers = ('Last Uninstalled', 'Bundle ID',)
+        data_headers = (
+            'Last Uninstalled',
+            'Bundle ID',
+        )
         report.write_artifact_data_table(data_headers, data_list_uninstalled, location)
         report.end_artifact_report()
 
@@ -466,7 +542,10 @@ class MobileInstall(ab.AbstractArtifact):
         report = ArtifactHtmlReport('Apps - Installed')
         report.start_artifact_report(report_folder, 'Apps - Installed', description)
         report.add_script()
-        data_headers = ('Last Installed', 'Bundle ID',)
+        data_headers = (
+            'Last Installed',
+            'Bundle ID',
+        )
         report.write_artifact_data_table(data_headers, data_list_installed, location)
         report.end_artifact_report()
 
@@ -480,10 +559,13 @@ class MobileInstall(ab.AbstractArtifact):
             if row[0] == "":
                 continue
             else:
-                f3 = open(os.path.join(report_folder, "Apps_Historical", distinctbundle + ".txt"),
-                        "w+",
-                        encoding="utf8"
-                        )  # Create historical app report per app
+                f3 = open(
+                    os.path.join(
+                        report_folder, "Apps_Historical", distinctbundle + ".txt"
+                    ),
+                    "w+",
+                    encoding="utf8",
+                )  # Create historical app report per app
                 cursor.execute(
                     """SELECT * from dimm where bundle_id=? order by time_stamp DESC""",
                     (distinctbundle,),
@@ -501,9 +583,8 @@ class MobileInstall(ab.AbstractArtifact):
         path = os.path.join(report_folder, "Apps_Historical")
         files = os.listdir(path)
         for name in files:
-            bun = (f'{name}')
-            appendval = (
-                f'<a href = "./Mobile Installation Logs/Apps_Historical/{name}" style = "color:blue" target="content">Report</a>')
+            bun = f'{name}'
+            appendval = f'<a href = "./Mobile Installation Logs/Apps_Historical/{name}" style = "color:blue" target="content">Report</a>'
             data_list.append((bun, appendval))
 
         location = f'{filename}'
@@ -513,7 +594,9 @@ class MobileInstall(ab.AbstractArtifact):
         report.add_script()
         data_headers = ('Bundle ID', 'Report Link')
         tsv_data_headers = ('Bundle ID', 'Report Link')
-        report.write_artifact_data_table(data_headers, data_list, location, html_escape=False)
+        report.write_artifact_data_table(
+            data_headers, data_list, location, html_escape=False
+        )
         report.end_artifact_report()
 
         tsvname = 'Mobile Installation Logs - History'
@@ -525,7 +608,9 @@ class MobileInstall(ab.AbstractArtifact):
         # All event historical in html report
         description = 'Historical App report from the Mobile Installation Logs. All timestamps are in Local Time'
         report = ArtifactHtmlReport('Apps - Historical')
-        report.start_artifact_report(report_folder, 'Apps - Historical Combined', description)
+        report.start_artifact_report(
+            report_folder, 'Apps - Historical Combined', description
+        )
         report.add_script()
         data_headers = ('Timestamp', 'Event', 'Bundle ID', 'Event Path')
         report.write_artifact_data_table(data_headers, tsv_tml_data_list, location)
@@ -550,7 +635,9 @@ class MobileInstall(ab.AbstractArtifact):
             report.start_artifact_report(report_folder, 'State - Reboots', description)
             report.add_script()
             data_headers_reboots = ('Timestamp (Local Time)', 'Description')
-            report.write_artifact_data_table(data_headers_reboots, data_list_reboots, location)
+            report.write_artifact_data_table(
+                data_headers_reboots, data_list_reboots, location
+            )
             report.end_artifact_report()
 
             tsvname = 'Mobile Installation Logs - Reboots'
@@ -611,6 +698,8 @@ class MobileInstall(ab.AbstractArtifact):
     report.write_artifact_data_table(data_headers, data_list, location, html_escape=False)
     report.end_artifact_report()
 """
+
+
 def month_converter(month):
     months = [
         "Jan",

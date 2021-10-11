@@ -3,15 +3,15 @@ from helpers import timeline, tsv
 from xleapp.html_report import Icon
 from html_report.artifact_report import ArtifactHtmlReport
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class DataUsageProcessB(ab.AbstractArtifact):
+class DataUsageProcessB(ab.Artifact):
 
     _name = 'Data Usage Process'
     _search_dirs = '**/DataUsage.sqlite'
     _category = 'Data Usage'
-    _web_icon = Icon.WIFI
+    _web_icon = WebIcon.WIFI
 
     def __init__(self):
         super().__init__(self)

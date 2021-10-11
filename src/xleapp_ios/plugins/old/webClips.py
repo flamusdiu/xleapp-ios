@@ -3,14 +3,14 @@ import os
 import plistlib
 
 from html_report.artifact_report import ArtifactHtmlReport
-from helpers import is_platform_windows,   tsv
+from helpers import is_platform_windows, tsv
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class WebClips (ab.AbstractArtifact):
+class WebClips(ab.Artifact):
     _name = 'Webclips'
-    _search_dirs = ('*WebClips/*.webclip/*')
+    _search_dirs = '*WebClips/*.webclip/*'
     _category = 'iOS Screens'
 
     def get(self, files_found, seeker):
@@ -36,7 +36,7 @@ class WebClips (ab.AbstractArtifact):
                 webclip_data[unique_id]["Info"] = path_val
 
             # Is this the path to the icon?
-            if "icon.png" in pathstr:
+            if "WebIcon.png" in pathstr:
                 webclip_data[unique_id]["Icon_path"] = path_val
 
         logfunc(f"Webclips found: {len(webclip_data)} ")
@@ -58,18 +58,23 @@ class WebClips (ab.AbstractArtifact):
 
         # Create the report
         for unique_id, data in webclip_data.items():
-            htmlstring = (f'<table>')
-            htmlstring = htmlstring +('<tr>')
-            htmlstring = htmlstring +(f'<td><img src="data:image/png;base64,{data["Icon_data"]}"></td>')
-            htmlstring = htmlstring +(f'<td><b>UID:{unique_id}</b><br> Title: {data["Title"]}<br>URL: {data["URL"]}</td>')
-            htmlstring = htmlstring +('</tr>')
-            htmlstring = htmlstring +('</table>')
+            htmlstring = f'<table>'
+            htmlstring = htmlstring + ('<tr>')
+            htmlstring = htmlstring + (
+                f'<td><img src="data:image/png;base64,{data["Icon_data"]}"></td>'
+            )
+            htmlstring = htmlstring + (
+                f'<td><b>UID:{unique_id}</b><br> Title: {data["Title"]}<br>URL: {data["URL"]}</td>'
+            )
+            htmlstring = htmlstring + ('</tr>')
+            htmlstring = htmlstring + ('</table>')
             data_list.append((htmlstring,))
-
 
         report = ArtifactHtmlReport(f'WebClips')
         report.start_artifact_report(report_folder, f'WebClips')
         report.add_script()
-        data_headers = ((f'WebClips',))
-        report.write_artifact_data_table(data_headers, data_list, files_found[0], html_escape=False)
+        data_headers = (f'WebClips',)
+        report.write_artifact_data_table(
+            data_headers, data_list, files_found[0], html_escape=False
+        )
         report.end_artifact_report()

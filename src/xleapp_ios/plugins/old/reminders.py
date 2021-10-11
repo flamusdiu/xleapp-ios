@@ -3,12 +3,12 @@ from os.path import dirname
 from html_report.artifact_report import ArtifactHtmlReport
 from helpers import open_sqlite_db_readonly, timeline, tsv
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class Reminders (ab.AbstractArtifact):
+class Reminders(ab.Artifact):
     _name = 'Reminders'
-    _search_dirs = ('**/Reminders/Container_v1/Stores/*.sqlite')
+    _search_dirs = '**/Reminders/Container_v1/Stores/*.sqlite'
     _category = 'Reminders'
 
     def get(self, files_found, seeker):
@@ -16,7 +16,8 @@ class Reminders (ab.AbstractArtifact):
         for file_found in files_found:
             db = open_sqlite_db_readonly(file_found)
             cursor = db.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT
                 DATETIME(ZCREATIONDATE+978307200,'UNIXEPOCH'),
                 DATETIME(ZLASTMODIFIEDDATE+978307200,'UNIXEPOCH'),
@@ -24,7 +25,8 @@ class Reminders (ab.AbstractArtifact):
                 ZTITLE1
                 FROM ZREMCDOBJECT
                 WHERE ZTITLE1 <> ''
-                """)
+                """
+            )
 
             all_rows = cursor.fetchall()
 
@@ -38,7 +40,13 @@ class Reminders (ab.AbstractArtifact):
             report = ArtifactHtmlReport('Reminders')
             report.start_artifact_report(report_folder, 'Reminders')
             report.add_script()
-            data_headers = ('Creation Date', 'Title', 'Note to Reminder', 'Last Modified', 'File Location')
+            data_headers = (
+                'Creation Date',
+                'Title',
+                'Note to Reminder',
+                'Last Modified',
+                'File Location',
+            )
             report.write_artifact_data_table(data_headers, data_list, dir_file_found)
             report.end_artifact_report()
 

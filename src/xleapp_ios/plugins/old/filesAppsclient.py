@@ -5,15 +5,15 @@ from helpers import timeline, tsv
 from xleapp.html_report import Icon
 from html_report.artifact_report import ArtifactHtmlReport
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class FilesAppsClient(ab.AbstractArtifact):
+class FilesAppsClient(ab.Artifact):
 
     _name = 'Files App - iCloud Client Items'
     _search_dirs = '*private/var/mobile/Library/Application Support/CloudDocs/session/db/client.db*'
     _category = 'Files App'
-    _web_icon = Icon.FILES_TEXT
+    _web_icon = WebIcon.FILES_TEXT
 
     def __init__(self):
         super().__init__(self)

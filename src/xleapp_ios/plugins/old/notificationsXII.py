@@ -5,12 +5,12 @@ import nska_deserialize as nd
 from html_report.artifact_report import ArtifactHtmlReport
 from helpers import timeline, tsv
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class NotificationsXII(ab.AbstractArtifact):
+class NotificationsXII(ab.Artifact):
     _name = 'iOS Notifications'
-    _search_dirs = ('*private/var/mobile/Library/UserNotifications*')
+    _search_dirs = '*private/var/mobile/Library/UserNotifications*'
     _category = 'Notifications'
 
     def get(self, files_found, seeker):
@@ -47,21 +47,35 @@ class NotificationsXII(ab.AbstractArtifact):
                         # if bundle_name == 'com.apple.ScreenTimeNotifications':
                         #     pass # has embedded plist!
                         for k, v in item.items():
-                            if k == 'AppNotificationCreationDate': creation_date = str(v)
-                            elif k == 'AppNotificationMessage': message = v
-                            elif k == 'AppNotificationTitle': title = v
-                            elif k == 'AppNotificationSubtitle': subtitle = v
+                            if k == 'AppNotificationCreationDate':
+                                creation_date = str(v)
+                            elif k == 'AppNotificationMessage':
+                                message = v
+                            elif k == 'AppNotificationTitle':
+                                title = v
+                            elif k == 'AppNotificationSubtitle':
+                                subtitle = v
                             else:
                                 if isinstance(v, bytes):
-                                    logfunc(f'Found binary data, look into this one later k={k}!')
+                                    logfunc(
+                                        f'Found binary data, look into this one later k={k}!'
+                                    )
                                 elif isinstance(v, dict):
-                                    pass # recurse look for plists # TODO
+                                    pass  # recurse look for plists # TODO
                                 elif isinstance(v, list):
-                                    pass # recurse look for plists # TODO
+                                    pass  # recurse look for plists # TODO
                                 other_dict[k] = str(v)
                         if subtitle:
                             title += f'[{subtitle}]'
-                        data_list.append((creation_date, bundle_name, title, message, str(other_dict)))
+                        data_list.append(
+                            (
+                                creation_date,
+                                bundle_name,
+                                title,
+                                message,
+                                str(other_dict),
+                            )
+                        )
                     p.close()
 
                 elif "AttachmentsList" in file_name:
@@ -71,7 +85,13 @@ class NotificationsXII(ab.AbstractArtifact):
         report = ArtifactHtmlReport('iOS Notificatons')
         report.start_artifact_report(report_folder, 'iOS Notifications', description)
         report.add_script()
-        data_headers = ('Creation Time', 'Bundle', 'Title[Subtitle]', 'Message', 'Other Details')
+        data_headers = (
+            'Creation Time',
+            'Bundle',
+            'Title[Subtitle]',
+            'Message',
+            'Other Details',
+        )
         report.write_artifact_data_table(data_headers, data_list, filepath)
         report.end_artifact_report()
 
@@ -102,7 +122,9 @@ def get_bundle_info(files_found):
 
     for file_path in files_found:
         file_path = str(file_path)
-        if file_path.endswith('Library.plist') and os.path.dirname(file_path).endswith('UserNotificationsServer'):
+        if file_path.endswith('Library.plist') and os.path.dirname(file_path).endswith(
+            'UserNotificationsServer'
+        ):
             bundle_info = get_bundle_id_and_names_from_plist(file_path)
             return bundle_info
         # If this is fs search, then only top level folder will be present, so append path and search it too

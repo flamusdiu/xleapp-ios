@@ -7,17 +7,16 @@ import sqlite3
 
 from html_report.artifact_report import ArtifactHtmlReport
 from packaging import version
-from helpers import(is_platform_windows, kmlgen,
-                             open_sqlite_db_readonly, timeline, tsv)
+from helpers import is_platform_windows, kmlgen, open_sqlite_db_readonly, timeline, tsv
 
 import artifacts.artGlobals
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class RoutineDParkedHistorical(ab.AbstractArtifact):
+class RoutineDParkedHistorical(ab.Artifact):
     _name = 'RoutineD Parked Vehicle Historical'
-    _search_dirs = ('**/Local.sqlite')
+    _search_dirs = '**/Local.sqlite'
     _category = 'Locations'
 
     def get(self, files_found, seeker):
@@ -29,7 +28,8 @@ class RoutineDParkedHistorical(ab.AbstractArtifact):
         file_found = str(files_found[0])
         db = open_sqlite_db_readonly(file_found)
         cursor = db.cursor()
-        cursor.execute("""
+        cursor.execute(
+            """
         select
         datetime(zrtvehicleeventhistorymo.zdate + 978307200, 'unixepoch'),
         datetime(zrtvehicleeventhistorymo.zlocdate + 978307200, 'unixepoch'),
@@ -39,7 +39,8 @@ class RoutineDParkedHistorical(ab.AbstractArtifact):
         zloclongitude
         from
         zrtvehicleeventhistorymo
-        """)
+        """
+        )
 
         all_rows = cursor.fetchall()
         usageentries = len(all_rows)
@@ -50,9 +51,18 @@ class RoutineDParkedHistorical(ab.AbstractArtifact):
 
             description = ''
             report = ArtifactHtmlReport('RoutineD Parked Vehicle Historical')
-            report.start_artifact_report(report_folder, 'Parked Vehicle Historical', description)
+            report.start_artifact_report(
+                report_folder, 'Parked Vehicle Historical', description
+            )
             report.add_script()
-            data_headers = ('Timestamp','Location Date','Location Uncertainty','Identifier','Latitude','Longitude')
+            data_headers = (
+                'Timestamp',
+                'Location Date',
+                'Location Uncertainty',
+                'Identifier',
+                'Latitude',
+                'Longitude',
+            )
             report.write_artifact_data_table(data_headers, data_list, file_found)
             report.end_artifact_report()
 

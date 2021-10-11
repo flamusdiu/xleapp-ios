@@ -3,14 +3,14 @@ from helpers.db import open_sqlite_db_readonly
 from xleapp.html_report import Icon
 from html_report.artifact_report import ArtifactHtmlReport
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class AppleWalletTransactions(ab.AbstractArtifact):
+class AppleWalletTransactions(ab.Artifact):
     _name = 'Apple Wallet Transaction'
     _search_dirs = '**/passes23.sqlite'
     _category = 'Apple Wallet'
-    _web_icon = Icon.DOLLAR_SIGN
+    _web_icon = WebIcon.DOLLAR_SIGN
 
     def __init__(self):
         super().__init__(self)

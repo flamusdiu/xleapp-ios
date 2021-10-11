@@ -3,15 +3,15 @@ from html_report.artifact_report import ArtifactHtmlReport
 from helpers import timeline, tsv
 from helpers.db import open_sqlite_db_readonly
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class CoreDuetAireplane(ab.AbstractArtifact):
+class CoreDuetAireplane(ab.Artifact):
 
     _name = 'CoreDuet Airplane Mode'
     _search_dirs = '**/coreduetd.db'
     _category = 'CoreDuet'
-    _web_icon = Icon.PAUSE
+    _web_icon = WebIcon.PAUSE
 
     def __init__(self):
         super().__init__(self)

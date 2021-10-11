@@ -5,15 +5,15 @@ from helpers import tsv
 from xleapp.html_report import Icon
 from html_report.artifact_report import ArtifactHtmlReport
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class DiscordManifest(ab.AbstractArtifact):
+class DiscordManifest(ab.Artifact):
 
     _name = 'Discord Manifest'
     _search_dirs = '*/private/var/mobile/Containers/Data/Application/*/Documents/RCTAsyncLocalStorage_V1/manifest.json'
     _category = 'Discord'
-    _web_icon = Icon.FILE_TEXT
+    _web_icon = WebIcon.FILE_TEXT
 
     def __init__(self):
         super().__init__(self)

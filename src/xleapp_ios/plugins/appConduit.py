@@ -2,42 +2,40 @@ import datetime
 import re
 from dataclasses import dataclass
 
-from xleapp.artifacts.abstract import AbstractArtifact
-from xleapp.helpers.decorators import Search, timed
-from xleapp.report.webicons import Icon
+from xleapp import Artifact, Search, WebIcon, timed
 
 
 @dataclass
-class AppConduit(AbstractArtifact):
+class AppConduit(Artifact):
     def __post_init__(self):
 
-        self.name = 'App Conduit'
-        self.category = 'App Conduit'
-        self.web_icon = Icon.ACTIVITY
+        self.name = "App Conduit"
+        self.category = "App Conduit"
+        self.web_icon = WebIcon.ACTIVITY
         self.report_headers = [
-            ('Device ID', 'Device type and version', 'Device extra information'),
-            ('Time', 'Device interaction', 'Device ID', 'Log File Name'),
+            ("Device ID", "Device type and version", "Device extra information"),
+            ("Time", "Device interaction", "Device ID", "Log File Name"),
         ]
 
     @timed
-    @Search('**/AppConduit.log.*', file_names_only=True)
+    @Search("**/AppConduit.log.*", file_names_only=True)
     def process(self):
         data_list = []
         device_type_and_info = []
 
-        info = ''
+        info = ""
         reg_filter = (
-            r'(([A-Za-z]+[\s]+([a-zA-Z]+[\s]+[0-9]+)[\s]+'
-            r'([0-9]+\:[0-9]+\:[0-9]+)[\s]+([0-9]{4}))([\s]+'
-            r'[\[\d\]]+[\s]+[\<a-z\>]+[\s]+[\(\w\)]+)[\s\-]+'
-            r'(((.*)(device+\:([\w]+\-[\w]+\-[\w]+\-[\w]+'
-            r'\-[\w]+))(.*)$)))'
+            r"(([A-Za-z]+[\s]+([a-zA-Z]+[\s]+[0-9]+)[\s]+"
+            r"([0-9]+\:[0-9]+\:[0-9]+)[\s]+([0-9]{4}))([\s]+"
+            r"[\[\d\]]+[\s]+[\<a-z\>]+[\s]+[\(\w\)]+)[\s\-]+"
+            r"(((.*)(device+\:([\w]+\-[\w]+\-[\w]+\-[\w]+"
+            r"\-[\w]+))(.*)$)))"
         )
 
         date_filter = re.compile(reg_filter)
 
         for fp in self.found:
-            fp_found = open(fp, 'r', encoding='utf8')
+            fp_found = open(fp(), "r", encoding="utf8")
             linecount = 0
 
             for line in fp_found:
@@ -46,15 +44,15 @@ class AppConduit(AbstractArtifact):
 
                 if line_match:
                     date_time = line_match.group(3, 5, 4)
-                    conv_time = ' '.join(date_time)
+                    conv_time = " ".join(date_time)
                     dtime_obj = datetime.datetime.strptime(
                         conv_time,
-                        '%b %d %Y %H:%M:%S',
+                        "%b %d %Y %H:%M:%S",
                     )
                     values = line_match.group(9)
                     device_id = line_match.group(11)
 
-                    if 'devicesAreNowConnected' in values:
+                    if "devicesAreNowConnected" in values:
                         device = (
                             device_id,
                             line_match.group(12).split(" ")[4],
@@ -62,12 +60,12 @@ class AppConduit(AbstractArtifact):
                         )
                         device_type_and_info.append(device)
 
-                        info = 'Connected'
+                        info = "Connected"
                         data = (dtime_obj, info, device_id, fp.name)
                         data_list.append(data)
 
-                    if 'devicesAreNoLongerConnected' in values:
-                        info = 'Disconnected'
+                    if "devicesAreNoLongerConnected" in values:
+                        info = "Disconnected"
                         data = (dtime_obj, info, device_id, fp.name)
                         data_list.append(data)
                     # if 'Resuming because' in values:
@@ -83,6 +81,6 @@ class AppConduit(AbstractArtifact):
         device_type_and_info = list(set(device_type_and_info))
 
         self.data = {
-            'device_type_and_info': device_type_and_info,
-            'device_connection_info': data_list,
+            "device_type_and_info": device_type_and_info,
+            "device_connection_info": data_list,
         }

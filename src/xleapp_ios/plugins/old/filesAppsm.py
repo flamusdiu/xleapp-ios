@@ -7,12 +7,13 @@ import datetime
 from html_report.artifact_report import ArtifactHtmlReport
 from helpers import tsv, timeline, is_platform_windows, open_sqlite_db_readonly
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
-class FilesAppsSM(ab.AbstractArtifact):
+
+class FilesAppsSM(ab.Artifact):
 
     _name = 'File Apps - Filenames'
-    _search_dirs = ('*private/var/mobile/Containers/Shared/AppGroup/*/smartfolders.db*')
+    _search_dirs = '*private/var/mobile/Containers/Shared/AppGroup/*/smartfolders.db*'
     _category = 'Files App'
 
     def get(self, files_found, seeker):
@@ -24,11 +25,13 @@ class FilesAppsSM(ab.AbstractArtifact):
 
         db = open_sqlite_db_readonly(file_found)
         cursor = db.cursor()
-        cursor.execute("""
+        cursor.execute(
+            """
         SELECT *
         FROM
         FILENAMES
-        """)
+        """
+        )
 
         all_rows = cursor.fetchall()
         usageentries = len(all_rows)
@@ -37,11 +40,13 @@ class FilesAppsSM(ab.AbstractArtifact):
 
             for row in all_rows:
 
-                output_file = open(os.path.join(report_folder, row[2]+'.bplist'), "wb")
+                output_file = open(
+                    os.path.join(report_folder, row[2] + '.bplist'), "wb"
+                )
                 output_file.write(row[1])
                 output_file.close()
 
-                with open(os.path.join(report_folder, row[2]+'.bplist'), "rb") as f:
+                with open(os.path.join(report_folder, row[2] + '.bplist'), "rb") as f:
                     deserialized_plist = nd.deserialize_plist(f)
                 for x, y in deserialized_plist.items():
                     if x == '_creationDate':
@@ -56,13 +61,37 @@ class FilesAppsSM(ab.AbstractArtifact):
                         childitemcount = y
                 lasthitdate = datetime.datetime.fromtimestamp(row[3])
 
-                data_list.append((lasthitdate, row[0], row[2],row[4], creationdate, contentmodificationdate, userinfo, childitemcount, flags))
+                data_list.append(
+                    (
+                        lasthitdate,
+                        row[0],
+                        row[2],
+                        row[4],
+                        creationdate,
+                        contentmodificationdate,
+                        userinfo,
+                        childitemcount,
+                        flags,
+                    )
+                )
 
                 description = 'Files App - Files stored in the "On my iPad" area.'
                 report = ArtifactHtmlReport('Files App - Filenames')
-                report.start_artifact_report(report_folder, 'Files App - Filenames', description)
+                report.start_artifact_report(
+                    report_folder, 'Files App - Filenames', description
+                )
                 report.add_script()
-                data_headers = ('Last Hit Date','Folder ID','Filename','Frequency at Las Hit Date','Creation Date','Modification Date','User Info','Child Item Count','Flags' )
+                data_headers = (
+                    'Last Hit Date',
+                    'Folder ID',
+                    'Filename',
+                    'Frequency at Las Hit Date',
+                    'Creation Date',
+                    'Modification Date',
+                    'User Info',
+                    'Child Item Count',
+                    'Flags',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -75,4 +104,3 @@ class FilesAppsSM(ab.AbstractArtifact):
             logfunc('No Files App - Filenames data available')
 
         db.close()
-

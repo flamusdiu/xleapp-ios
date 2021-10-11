@@ -6,13 +6,13 @@ from helpers import open_sqlite_db_readonly, timeline, tsv
 
 import artifacts.artGlobals
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class Health(ab.AbstractArtifact):
+class Health(ab.Artifact):
 
     _name = 'Health Data'
-    _search_dirs = ('**/healthdb_secure.sqlite')
+    _search_dirs = '**/healthdb_secure.sqlite'
     _category = 'Health Data'
 
     def get(self, files_found, seeker):
@@ -22,7 +22,8 @@ class Health(ab.AbstractArtifact):
         iOSversion = artifacts.artGlobals.versionf
         if version.parse(iOSversion) >= version.parse("12"):
             cursor = db.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(samples.start_date + 978307200, 'unixepoch'),
             datetime(samples.end_date + 978307200, 'unixepoch'),
@@ -55,7 +56,8 @@ class Health(ab.AbstractArtifact):
             and metadata_keys.rowid = metadata_values.key_id
             and  workouts.data_id = samples.data_id
             and workouts.activity_type not null and key is "_HKPrivateWorkoutAverageHeartRate"
-            """)
+            """
+            )
 
             all_rows = cursor.fetchall()
             usageentries = len(all_rows)
@@ -63,14 +65,39 @@ class Health(ab.AbstractArtifact):
                 data_list = []
                 for row in all_rows:
                     data_list.append(
-                        (row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11]))
+                        (
+                            row[0],
+                            row[1],
+                            row[2],
+                            row[3],
+                            row[4],
+                            row[5],
+                            row[6],
+                            row[7],
+                            row[8],
+                            row[9],
+                            row[10],
+                            row[11],
+                        )
+                    )
 
                 report = ArtifactHtmlReport('Health Workout Cadence')
                 report.start_artifact_report(report_folder, 'Workout Cadence')
                 report.add_script()
                 data_headers = (
-                    'Start Date', 'End Date', 'Strides per Min.', 'Workout Type', 'Duration in Mins.', 'Calories Burned',
-                    'Distance in KM', 'Distance in Miles', 'Goal Type', 'Goal', 'Flights Climbed', 'Steps')
+                    'Start Date',
+                    'End Date',
+                    'Strides per Min.',
+                    'Workout Type',
+                    'Duration in Mins.',
+                    'Calories Burned',
+                    'Distance in KM',
+                    'Distance in Miles',
+                    'Goal Type',
+                    'Goal',
+                    'Flights Climbed',
+                    'Steps',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -84,7 +111,8 @@ class Health(ab.AbstractArtifact):
 
         if version.parse(iOSversion) >= version.parse("9"):
             cursor = db.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(samples.start_date + 978307200, 'unixepoch'),
             datetime(samples.end_date + 978307200, 'unixepoch'),
@@ -102,7 +130,7 @@ class Health(ab.AbstractArtifact):
             where
             samples.data_type = 8
             """
-                        )
+            )
 
             all_rows = cursor.fetchall()
             usageentries = len(all_rows)
@@ -117,7 +145,13 @@ class Health(ab.AbstractArtifact):
                 report = ArtifactHtmlReport('Health Distance')
                 report.start_artifact_report(report_folder, 'Distance', description)
                 report.add_script()
-                data_headers = ('Start Date', 'End Date', 'Distance in Meters', 'Distance in Feet', 'Time in Seconds')
+                data_headers = (
+                    'Start Date',
+                    'End Date',
+                    'Distance in Meters',
+                    'Distance in Feet',
+                    'Time in Seconds',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -129,7 +163,8 @@ class Health(ab.AbstractArtifact):
 
         if version.parse(iOSversion) >= version.parse("12"):
             cursor = db.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(samples.start_date + 978307200, 'unixepoch'),
             datetime(samples.end_date + 978307200, 'unixepoch'),
@@ -149,7 +184,7 @@ class Health(ab.AbstractArtifact):
             where
             key is "_HKPrivateMetadataKeyElectrocardiogramHeartRate"
             """
-                        )
+            )
 
             all_rows = cursor.fetchall()
             usageentries = len(all_rows)
@@ -162,9 +197,16 @@ class Health(ab.AbstractArtifact):
 
                 description = ''
                 report = ArtifactHtmlReport('Health ECG Avg Heart Rate')
-                report.start_artifact_report(report_folder, 'ECG Avg. Heart Rate', description)
+                report.start_artifact_report(
+                    report_folder, 'ECG Avg. Heart Rate', description
+                )
                 report.add_script()
-                data_headers = ('Start Date', 'End Date', 'ECG Avg. Heart Rate', 'Time in Seconds')
+                data_headers = (
+                    'Start Date',
+                    'End Date',
+                    'ECG Avg. Heart Rate',
+                    'Time in Seconds',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -176,7 +218,8 @@ class Health(ab.AbstractArtifact):
 
         if version.parse(iOSversion) >= version.parse("9"):
             cursor = db.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(samples.start_date + 978307200, 'unixepoch'),
             datetime(samples.end_date + 978307200, 'unixepoch'),
@@ -187,7 +230,7 @@ class Health(ab.AbstractArtifact):
             where samples.data_id = quantity_samples.data_id
             and samples.data_type = 12
             """
-                        )
+            )
 
             all_rows = cursor.fetchall()
             usageentries = len(all_rows)
@@ -202,7 +245,12 @@ class Health(ab.AbstractArtifact):
             report = ArtifactHtmlReport('Health Flights Climbed')
             report.start_artifact_report(report_folder, 'Flights Climbed', description)
             report.add_script()
-            data_headers = ('Start Date', 'End Date', 'Flights Climbed', 'Time in Seconds')
+            data_headers = (
+                'Start Date',
+                'End Date',
+                'Flights Climbed',
+                'Time in Seconds',
+            )
             report.write_artifact_data_table(data_headers, data_list, file_found)
             report.end_artifact_report()
 
@@ -214,7 +262,8 @@ class Health(ab.AbstractArtifact):
 
         if version.parse(iOSversion) >= version.parse("9"):
             cursor = db.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(samples.start_date + 978307200, 'unixepoch'),
             original_quantity,
@@ -226,7 +275,7 @@ class Health(ab.AbstractArtifact):
             and quantity_samples.original_unit = unit_strings.rowid
             and samples.data_id = quantity_samples.data_id
             """
-                        )
+            )
 
             all_rows = cursor.fetchall()
             usageentries = len(all_rows)
@@ -253,7 +302,8 @@ class Health(ab.AbstractArtifact):
 
         if version.parse(iOSversion) >= version.parse("9"):
             cursor = db.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(samples.start_date + 978307200, 'unixepoch'),
             datetime(samples.end_date + 978307200, 'unixepoch'),
@@ -263,7 +313,8 @@ class Health(ab.AbstractArtifact):
             samples, quantity_samples
             where samples.data_type = 75
             and samples.data_id = quantity_samples.data_id
-            """)
+            """
+            )
 
             all_rows = cursor.fetchall()
             usageentries = len(all_rows)
@@ -289,7 +340,8 @@ class Health(ab.AbstractArtifact):
 
         if version.parse(iOSversion) >= version.parse("9"):
             cursor = db.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
             SELECT
             datetime(SAMPLES.START_DATE + 978307200, 'unixepoch'),
             datetime(SAMPLES.END_DATE + 978307200, 'unixepoch'),
@@ -301,7 +353,8 @@ class Health(ab.AbstractArtifact):
                 AND SAMPLES.DATA_ID = QUANTITY_SAMPLES.DATA_ID
                 AND SAMPLES.DATA_ID = OBJECTS.DATA_ID
                 AND OBJECTS.PROVENANCE = data_provenances.ROWID
-            """)
+            """
+            )
 
             all_rows = cursor.fetchall()
             usageentries = len(all_rows)
@@ -328,7 +381,13 @@ class Health(ab.AbstractArtifact):
                 report = ArtifactHtmlReport('Health Steps')
                 report.start_artifact_report(report_folder, 'Steps')
                 report.add_script()
-                data_headers = ('Start Date', 'End Date', 'Steps', 'Time in Seconds', 'Origin')
+                data_headers = (
+                    'Start Date',
+                    'End Date',
+                    'Steps',
+                    'Time in Seconds',
+                    'Origin',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -340,10 +399,14 @@ class Health(ab.AbstractArtifact):
 
                 description = 'Cumulative total of the steps gathered from all available sources for each day'
                 report = ArtifactHtmlReport('Health Steps per Day')
-                report.start_artifact_report(report_folder, 'Steps per Day', description)
+                report.start_artifact_report(
+                    report_folder, 'Steps per Day', description
+                )
                 report.add_script()
                 data_headers = ('Date', 'Steps', 'Time in Seconds')
-                report.write_artifact_data_table(data_headers, daily_steps_list, file_found)
+                report.write_artifact_data_table(
+                    data_headers, daily_steps_list, file_found
+                )
                 report.end_artifact_report()
 
                 tsvname = 'Health Steps per Day'
@@ -357,7 +420,8 @@ class Health(ab.AbstractArtifact):
 
         if version.parse(iOSversion) >= version.parse("9"):
             cursor = db.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
             SELECT
             DATETIME(SAMPLES.START_DATE + 978307200, 'UNIXEPOCH'),
             QUANTITY,
@@ -367,7 +431,8 @@ class Health(ab.AbstractArtifact):
             WHERE SAMPLES.DATA_TYPE = 3
             AND "DATE" IS  NOT NULL
             and SAMPLES.DATA_ID = QUANTITY_SAMPLES.DATA_ID
-            """)
+            """
+            )
 
             all_rows = cursor.fetchall()
             usageentries = len(all_rows)
@@ -393,7 +458,8 @@ class Health(ab.AbstractArtifact):
 
         if version.parse(iOSversion) >= version.parse("9"):
             cursor = db.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(samples.start_date + 978307200, 'unixepoch'),
             datetime(samples.end_date + 978307200, 'unixepoch'),
@@ -427,7 +493,8 @@ class Health(ab.AbstractArtifact):
             and metadata_keys.rowid = metadata_values.key_id
             and  workouts.data_id = samples.data_id
             and workouts.activity_type not null and (key is null or key is  "HKIndoorWorkout")
-            """)
+            """
+            )
 
             all_rows = cursor.fetchall()
             usageentries = len(all_rows)
@@ -435,14 +502,39 @@ class Health(ab.AbstractArtifact):
                 data_list = []
                 for row in all_rows:
                     data_list.append(
-                        (row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11]))
+                        (
+                            row[0],
+                            row[1],
+                            row[2],
+                            row[3],
+                            row[4],
+                            row[5],
+                            row[6],
+                            row[7],
+                            row[8],
+                            row[9],
+                            row[10],
+                            row[11],
+                        )
+                    )
 
                 report = ArtifactHtmlReport('Health Workout General')
                 report.start_artifact_report(report_folder, 'Workout General')
                 report.add_script()
                 data_headers = (
-                    'Start Date', 'End Date', 'Workout Type', 'Duration in Min.', 'Calories Burned', 'Distance in KM',
-                    'Distance in Miles', 'Total Base Energy Burned', 'Goal Type', 'Goal', 'Flights Climbed', 'Steps')
+                    'Start Date',
+                    'End Date',
+                    'Workout Type',
+                    'Duration in Min.',
+                    'Calories Burned',
+                    'Distance in KM',
+                    'Distance in Miles',
+                    'Total Base Energy Burned',
+                    'Goal Type',
+                    'Goal',
+                    'Flights Climbed',
+                    'Steps',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -456,14 +548,16 @@ class Health(ab.AbstractArtifact):
 
         if version.parse(iOSversion) >= version.parse("9"):
             cursor = db.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
             SELECT
             DATETIME(SAMPLES.START_DATE + 978307200, 'UNIXEPOCH'),
             DATETIME(SAMPLES.END_DATE + 978307200, 'UNIXEPOCH'),
             cast(ROUND(QUANTITY) as int)
             FROM SAMPLES, QUANTITY_SAMPLES
             WHERE SAMPLES.DATA_TYPE = 172 AND SAMPLES.DATA_ID = QUANTITY_SAMPLES.DATA_ID
-            """)
+            """
+            )
 
             all_rows = cursor.fetchall()
             usageentries = len(all_rows)
@@ -473,7 +567,9 @@ class Health(ab.AbstractArtifact):
                     data_list.append((row[0], row[1], row[2]))
 
                 report = ArtifactHtmlReport('Environmental Sound Levels')
-                report.start_artifact_report(report_folder, 'Environmental Sound Levels')
+                report.start_artifact_report(
+                    report_folder, 'Environmental Sound Levels'
+                )
                 report.add_script()
                 data_headers = ('Start Date', 'End Date', 'Sound in dBA SPL')
                 report.write_artifact_data_table(data_headers, data_list, file_found)
@@ -489,14 +585,16 @@ class Health(ab.AbstractArtifact):
 
         if version.parse(iOSversion) >= version.parse("9"):
             cursor = db.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
             SELECT
             DATETIME(SAMPLES.START_DATE + 978307200, 'UNIXEPOCH'),
             DATETIME(SAMPLES.END_DATE + 978307200, 'UNIXEPOCH'),
             (SAMPLES.END_DATE - SAMPLES.START_DATE)
             FROM SAMPLES
             WHERE SAMPLES.DATA_TYPE = 63
-            """)
+            """
+            )
 
             all_rows = cursor.fetchall()
             usageentries = len(all_rows)

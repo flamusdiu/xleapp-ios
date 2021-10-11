@@ -3,18 +3,17 @@ import sqlite3
 
 from html_report.artifact_report import ArtifactHtmlReport
 from packaging import version
-from helpers import(is_platform_windows,
-                             open_sqlite_db_readonly, timeline, tsv)
+from helpers import is_platform_windows, open_sqlite_db_readonly, timeline, tsv
 
 import artifacts.artGlobals
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class KikMessages(ab.AbstractArtifact):
+class KikMessages(ab.Artifact):
 
     _name = 'Kik Messages'
-    _search_dirs = ('**/kik.sqlite*')
+    _search_dirs = '**/kik.sqlite*'
     _category = 'Kik'
 
     def get(self, files_found, seeker):
@@ -27,7 +26,8 @@ class KikMessages(ab.AbstractArtifact):
 
         db = open_sqlite_db_readonly(file_found)
         cursor = db.cursor()
-        cursor.execute("""
+        cursor.execute(
+            """
         SELECT
         datetime(ZKIKMESSAGE.ZRECEIVEDTIMESTAMP +978307200,'UNIXEPOCH') AS RECEIVEDTIME,
         datetime(ZKIKMESSAGE.ZTIMESTAMP +978307200,'UNIXEPOCH') as TIMESTAMP,
@@ -45,7 +45,8 @@ class KikMessages(ab.AbstractArtifact):
         from ZKIKMESSAGE
         left join ZKIKUSER on ZKIKMESSAGE.ZUSER = ZKIKUSER.Z_PK
         left join ZKIKATTACHMENT on ZKIKMESSAGE.Z_PK = ZKIKATTACHMENT.ZMESSAGE
-        """)
+        """
+        )
 
         all_rows = cursor.fetchall()
         usageentries = len(all_rows)
@@ -53,13 +54,24 @@ class KikMessages(ab.AbstractArtifact):
 
         if usageentries > 0:
             for row in all_rows:
-                data_list.append((row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7]))
+                data_list.append(
+                    (row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7])
+                )
 
             description = 'Kik Messages'
             report = ArtifactHtmlReport('Kik Messages')
             report.start_artifact_report(report_folder, 'Kik Messages', description)
             report.add_script()
-            data_headers = ('Received Time', 'Timestamp', 'Message', 'Type', 'User', 'Display Name', 'Username','Content' )
+            data_headers = (
+                'Received Time',
+                'Timestamp',
+                'Message',
+                'Type',
+                'User',
+                'Display Name',
+                'Username',
+                'Content',
+            )
             report.write_artifact_data_table(data_headers, data_list, file_found)
             report.end_artifact_report()
 

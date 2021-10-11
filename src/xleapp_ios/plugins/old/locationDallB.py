@@ -9,18 +9,25 @@ import sys
 
 from html_report.artifact_report import ArtifactHtmlReport
 from packaging import version
-from helpers import (does_table_exist, is_platform_windows, kmlgen,
-                             logfunc, open_sqlite_db_readonly, timeline, tsv)
+from helpers import (
+    does_table_exist,
+    is_platform_windows,
+    kmlgen,
+    logfunc,
+    open_sqlite_db_readonly,
+    timeline,
+    tsv,
+)
 
 import artifacts.artGlobals
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class LocationDAllB(ab.AbstractArtifact):
+class LocationDAllB(ab.Artifact):
 
     _name = 'App Harvest'
-    _search_dirs = ('**/cache_encryptedB.db')
+    _search_dirs = '**/cache_encryptedB.db'
     _category = 'Locations'
 
     def get(self, files_found, seeker):
@@ -28,11 +35,14 @@ class LocationDAllB(ab.AbstractArtifact):
         db = open_sqlite_db_readonly(file_found)
         iOSversion = artifacts.artGlobals.versionf
         if version.parse(iOSversion) >= version.parse("11"):
-            logfunc("Unsupported version for LocationD App Harvest on iOS " + iOSversion)
+            logfunc(
+                "Unsupported version for LocationD App Harvest on iOS " + iOSversion
+            )
         else:
             logfunc(iOSversion)
             cursor = db.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(timestamp + 978307200,'unixepoch'),
             bundleid,
@@ -49,20 +59,53 @@ class LocationDAllB(ab.AbstractArtifact):
             course,
             confidence
             from appharvest
-            """)
+            """
+            )
 
             all_rows = cursor.fetchall()
             usageentries = len(all_rows)
             data_list = []
             if usageentries > 0:
                 for row in all_rows:
-                    data_list.append((row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],row[11],row[12],row[13]))
+                    data_list.append(
+                        (
+                            row[0],
+                            row[1],
+                            row[2],
+                            row[3],
+                            row[4],
+                            row[5],
+                            row[6],
+                            row[7],
+                            row[8],
+                            row[9],
+                            row[10],
+                            row[11],
+                            row[12],
+                            row[13],
+                        )
+                    )
 
                 description = ''
                 report = ArtifactHtmlReport('LocationD App Harvest')
                 report.start_artifact_report(report_folder, 'App Harvest', description)
                 report.add_script()
-                data_headers = ('Timestamp','Bundle ID','Altitude','Horizontal Accuracy','Vertical Accuracy','State','Age','Routine Mode','Location of Interest Type','Latitude','Longitude','Speed','Course','Confidence')
+                data_headers = (
+                    'Timestamp',
+                    'Bundle ID',
+                    'Altitude',
+                    'Horizontal Accuracy',
+                    'Vertical Accuracy',
+                    'State',
+                    'Age',
+                    'Routine Mode',
+                    'Location of Interest Type',
+                    'Latitude',
+                    'Longitude',
+                    'Speed',
+                    'Course',
+                    'Confidence',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -79,7 +122,8 @@ class LocationDAllB(ab.AbstractArtifact):
 
         if does_table_exist(db, "cdmacelllocation"):
             cursor = db.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(timestamp + 978307200,'unixepoch'),
             mcc,
@@ -99,20 +143,61 @@ class LocationDAllB(ab.AbstractArtifact):
             latitude,
             longitude
             from cdmacelllocation
-            """)
+            """
+            )
 
             all_rows = cursor.fetchall()
             usageentries = len(all_rows)
             data_list = []
             if usageentries > 0:
                 for row in all_rows:
-                    data_list.append((row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],row[11],row[12],row[13],row[14],row[15],row[16]))
+                    data_list.append(
+                        (
+                            row[0],
+                            row[1],
+                            row[2],
+                            row[3],
+                            row[4],
+                            row[5],
+                            row[6],
+                            row[7],
+                            row[8],
+                            row[9],
+                            row[10],
+                            row[11],
+                            row[12],
+                            row[13],
+                            row[14],
+                            row[15],
+                            row[16],
+                        )
+                    )
 
                 description = ''
                 report = ArtifactHtmlReport('LocationD CDMA Location')
-                report.start_artifact_report(report_folder, 'CDMA Location', description)
+                report.start_artifact_report(
+                    report_folder, 'CDMA Location', description
+                )
                 report.add_script()
-                data_headers = ('Timestamp','MCC','SID','NID','BSID','ZONEID','BANDCLASS','Channel','PNOFFSET','Altitude','Speed','Course','Confidence','Horizontal Accuracy','Vertical Accuracy','Latitude','Longitude')
+                data_headers = (
+                    'Timestamp',
+                    'MCC',
+                    'SID',
+                    'NID',
+                    'BSID',
+                    'ZONEID',
+                    'BANDCLASS',
+                    'Channel',
+                    'PNOFFSET',
+                    'Altitude',
+                    'Speed',
+                    'Course',
+                    'Confidence',
+                    'Horizontal Accuracy',
+                    'Vertical Accuracy',
+                    'Latitude',
+                    'Longitude',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -129,7 +214,8 @@ class LocationDAllB(ab.AbstractArtifact):
 
         if does_table_exist(db, "celllocation"):
             cursor = db.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(timestamp + 978307200,'unixepoch'),
             mcc,
@@ -147,20 +233,57 @@ class LocationDAllB(ab.AbstractArtifact):
             latitude,
             longitude
             from celllocation
-            """)
+            """
+            )
 
             all_rows = cursor.fetchall()
             usageentries = len(all_rows)
             data_list = []
             if usageentries > 0:
                 for row in all_rows:
-                    data_list.append((row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],row[11],row[12],row[13],row[14]))
+                    data_list.append(
+                        (
+                            row[0],
+                            row[1],
+                            row[2],
+                            row[3],
+                            row[4],
+                            row[5],
+                            row[6],
+                            row[7],
+                            row[8],
+                            row[9],
+                            row[10],
+                            row[11],
+                            row[12],
+                            row[13],
+                            row[14],
+                        )
+                    )
 
                 description = ''
                 report = ArtifactHtmlReport('LocationD Cell Location')
-                report.start_artifact_report(report_folder, 'Cell Location', description)
+                report.start_artifact_report(
+                    report_folder, 'Cell Location', description
+                )
                 report.add_script()
-                data_headers = ('Timestamp','MCC','MNC','LAC','CI','UARFCN','PSC','Altitude','Speed','Course','Confidence','Horizontal Accuracy','Vertical Accuracy','Latitude','Longitude')
+                data_headers = (
+                    'Timestamp',
+                    'MCC',
+                    'MNC',
+                    'LAC',
+                    'CI',
+                    'UARFCN',
+                    'PSC',
+                    'Altitude',
+                    'Speed',
+                    'Course',
+                    'Confidence',
+                    'Horizontal Accuracy',
+                    'Vertical Accuracy',
+                    'Latitude',
+                    'Longitude',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -177,7 +300,8 @@ class LocationDAllB(ab.AbstractArtifact):
 
         if does_table_exist(db, "ltecelllocation"):
             cursor = db.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(timestamp + 978307200,'unixepoch'),
             mcc,
@@ -194,20 +318,53 @@ class LocationDAllB(ab.AbstractArtifact):
             latitude,
             longitude
             from ltecelllocation
-            """)
+            """
+            )
 
             all_rows = cursor.fetchall()
             usageentries = len(all_rows)
             data_list = []
             if usageentries > 0:
                 for row in all_rows:
-                    data_list.append((row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],row[11],row[12],row[13]))
+                    data_list.append(
+                        (
+                            row[0],
+                            row[1],
+                            row[2],
+                            row[3],
+                            row[4],
+                            row[5],
+                            row[6],
+                            row[7],
+                            row[8],
+                            row[9],
+                            row[10],
+                            row[11],
+                            row[12],
+                            row[13],
+                        )
+                    )
 
                 description = ''
                 report = ArtifactHtmlReport('LocationD LTE Location')
                 report.start_artifact_report(report_folder, 'LTE Location', description)
                 report.add_script()
-                data_headers = ('Timestamp','MCC','MNC','CI','UARFCN','PID','Altitude','Speed','Course','Confidence','Horizontal Accuracy','Vertical Accuracy','Latitude','Longitude')
+                data_headers = (
+                    'Timestamp',
+                    'MCC',
+                    'MNC',
+                    'CI',
+                    'UARFCN',
+                    'PID',
+                    'Altitude',
+                    'Speed',
+                    'Course',
+                    'Confidence',
+                    'Horizontal Accuracy',
+                    'Vertical Accuracy',
+                    'Latitude',
+                    'Longitude',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -223,7 +380,8 @@ class LocationDAllB(ab.AbstractArtifact):
                 logfunc('No data available for LocationD LTE Location')
 
         cursor = db.cursor()
-        cursor.execute("""
+        cursor.execute(
+            """
         select
         datetime(timestamp + 978307200,'unixepoch'),
         mac,
@@ -239,20 +397,51 @@ class LocationDAllB(ab.AbstractArtifact):
         latitude,
         longitude
         from wifilocation
-        """)
+        """
+        )
 
         all_rows = cursor.fetchall()
         usageentries = len(all_rows)
         data_list = []
         if usageentries > 0:
             for row in all_rows:
-                data_list.append((row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],row[11],row[12]))
+                data_list.append(
+                    (
+                        row[0],
+                        row[1],
+                        row[2],
+                        row[3],
+                        row[4],
+                        row[5],
+                        row[6],
+                        row[7],
+                        row[8],
+                        row[9],
+                        row[10],
+                        row[11],
+                        row[12],
+                    )
+                )
 
             description = ''
             report = ArtifactHtmlReport('LocationD WiFi Location')
             report.start_artifact_report(report_folder, 'WiFi Location', description)
             report.add_script()
-            data_headers = ('Timestamp','MAC','Channel','Infomask','Speed','Course','Confidence','Score','Reach','Horizontal Accuracy','Vertical Accuracy','Latitude','Longitude')
+            data_headers = (
+                'Timestamp',
+                'MAC',
+                'Channel',
+                'Infomask',
+                'Speed',
+                'Course',
+                'Confidence',
+                'Score',
+                'Reach',
+                'Horizontal Accuracy',
+                'Vertical Accuracy',
+                'Latitude',
+                'Longitude',
+            )
             report.write_artifact_data_table(data_headers, data_list, file_found)
             report.end_artifact_report()
 

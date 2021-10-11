@@ -4,15 +4,15 @@ from xleapp.html_report import Icon
 from html_report.artifact_report import ArtifactHtmlReport
 from helpers import tsv
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class DataArk(ab.AbstractArtifact):
+class DataArk(ab.Artifact):
 
     _name = 'Data Ark'
     _search_dirs = '**/Library/Lockdown/data_ark.plist'
     _category = 'IOS Build'
-    _web_icon = Icon.GIT_COMMIT
+    _web_icon = WebIcon.GIT_COMMIT
 
     def __init__(self):
         super().__init__(self)

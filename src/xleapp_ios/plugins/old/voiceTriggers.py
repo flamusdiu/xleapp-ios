@@ -7,10 +7,10 @@ from os.path import basename, dirname, isfile, join
 from html_report.artifact_report import ArtifactHtmlReport
 from helpers import timeline, tsv
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class VoiceTriggers (ab.AbstractArtifact):
+class VoiceTriggers(ab.Artifact):
     _name = 'Voice Triggers'
     _search_dirs = ('**/td/audio/*.json', '**/td/audio/*.wav')
     _category = 'Voice-Triggers'
@@ -21,16 +21,27 @@ class VoiceTriggers (ab.AbstractArtifact):
         if len(files_found) > 1:
             for file_found in files_found:
                 if file_found.endswith('wav'):
-                    shutil.copyfile(file_found, join(report_folder, basename(file_found)))
-                elif file_found.endswith('json') and 'meta_version.json' != basename(file_found):
+                    shutil.copyfile(
+                        file_found, join(report_folder, basename(file_found))
+                    )
+                elif file_found.endswith('json') and 'meta_version.json' != basename(
+                    file_found
+                ):
                     info_files.append(file_found)
 
             info_files.sort()
-            wav_files = [join(report_folder, file) for file in listdir(report_folder) if isfile(join(report_folder, file))]
+            wav_files = [
+                join(report_folder, file)
+                for file in listdir(report_folder)
+                if isfile(join(report_folder, file))
+            ]
             wav_files.sort()
 
             for info_file, wav_file in zip(info_files, wav_files):
-                if basename(info_file).split('.')[0] == basename(wav_file).split('.')[0]:
+                if (
+                    basename(info_file).split('.')[0]
+                    == basename(wav_file).split('.')[0]
+                ):
                     with open(info_file, "rb") as file:
                         fl = json.load(file)
                         if 'grainedDate' in fl:
@@ -43,15 +54,29 @@ class VoiceTriggers (ab.AbstractArtifact):
                                     <source src={} type="audio/wav">
                                     <p>Your browser does not support HTML5 audio elements.</p>
                                 </audio>
-                                """.format(wav_file)
+                                """.format(
+                            wav_file
+                        )
 
-                        data_list.append((creation_date, fl['productType'], fl['utteranceWav'], audio))
+                        data_list.append(
+                            (
+                                creation_date,
+                                fl['productType'],
+                                fl['utteranceWav'],
+                                audio,
+                            )
+                        )
 
             report = ArtifactHtmlReport('Voice Triggers')
             report.start_artifact_report(report_folder, 'Voice Triggers')
             report.add_script()
             data_headers = ('Creation Date', 'Device', 'Path to File', 'Audio File')
-            report.write_artifact_data_table(data_headers, data_list, dirname(file_found), html_no_escape=['Audio File'])
+            report.write_artifact_data_table(
+                data_headers,
+                data_list,
+                dirname(file_found),
+                html_no_escape=['Audio File'],
+            )
             report.end_artifact_report()
 
             tsvname = 'Voice Triggers'
@@ -62,7 +87,10 @@ class VoiceTriggers (ab.AbstractArtifact):
         else:
             logfunc('No Voice Triggers found')
 
+
 def format_time(date_time_str):
     date_time_obj = datetime.datetime.strptime(date_time_str, '%Y%m%d')
-    formatted = '{}-{}-{}'.format(date_time_obj.year, date_time_obj.month, date_time_obj.day)
+    formatted = '{}-{}-{}'.format(
+        date_time_obj.year, date_time_obj.month, date_time_obj.day
+    )
     return formatted

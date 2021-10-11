@@ -2,15 +2,15 @@ from html_report.artifact_report import ArtifactHtmlReport
 from helpers import timeline, tsv
 from helpers.db import open_sqlite_db_readonly
 from xleapp.html_report import Icon
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class CoreDuetPlugin(ab.AbstractArtifact):
+class CoreDuetPlugin(ab.Artifact):
 
     _name = 'CoreDuet Plugged In'
     _search_dirs = '**/coreduetd.db'
     _category = 'CoreDuet'
-    _web_icon = Icon.BATTERY_CHARGING
+    _web_icon = WebIcon.BATTERY_CHARGING
 
     def __init__(self):
         super().__init__(self)

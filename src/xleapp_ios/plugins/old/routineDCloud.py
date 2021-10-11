@@ -1,16 +1,15 @@
 from html_report.artifact_report import ArtifactHtmlReport
 from packaging import version
-from helpers import(kmlgen,  open_sqlite_db_readonly,
-                             timeline, tsv)
+from helpers import kmlgen, open_sqlite_db_readonly, timeline, tsv
 
 import artifacts.artGlobals
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class RoutineDCloud (ab.AbstractArtifact):
+class RoutineDCloud(ab.Artifact):
     _name = 'RoutineD Cloud'
-    _search_dirs = ('**/Library/Caches/com.apple.routined/Cloud-V2.sqlite*')
+    _search_dirs = '**/Library/Caches/com.apple.routined/Cloud-V2.sqlite*'
     _category = 'Locations'
 
     def get(self, files_found, seeker):
@@ -24,7 +23,8 @@ class RoutineDCloud (ab.AbstractArtifact):
         db = open_sqlite_db_readonly(file_found)
         cursor = db.cursor()
         if version.parse(iOSversion) >= version.parse("12"):
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zrtaddressmo.zcreationdate + 978307200, 'unixepoch'),
             datetime(zrtaddressmo.zexpirationdate + 978307200, 'unixepoch'),
@@ -38,20 +38,49 @@ class RoutineDCloud (ab.AbstractArtifact):
             zrtaddressmo.zsubadministrativearea,
             zrtaddressmo.zareasofinterest
             from zrtaddressmo
-            """)
+            """
+            )
 
             all_rows = cursor.fetchall()
             usageentries = len(all_rows)
             data_list = []
             if usageentries > 0:
                 for row in all_rows:
-                    data_list.append((row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10]))
+                    data_list.append(
+                        (
+                            row[0],
+                            row[1],
+                            row[2],
+                            row[3],
+                            row[4],
+                            row[5],
+                            row[6],
+                            row[7],
+                            row[8],
+                            row[9],
+                            row[10],
+                        )
+                    )
 
                 description = 'Address'
                 report = ArtifactHtmlReport('Locations')
-                report.start_artifact_report(report_folder, 'RoutineD Cloud Addresses', description)
+                report.start_artifact_report(
+                    report_folder, 'RoutineD Cloud Addresses', description
+                )
                 report.add_script()
-                data_headers = ('Address Creation Date','Address Expiration Date', 'Country', 'Country Code', 'Postal Code', 'Locality', 'Sublocality', 'Throroughfare', 'Subthroroughfare', 'Subadministrative Area', 'Area of Interest' )
+                data_headers = (
+                    'Address Creation Date',
+                    'Address Expiration Date',
+                    'Country',
+                    'Country Code',
+                    'Postal Code',
+                    'Locality',
+                    'Sublocality',
+                    'Throroughfare',
+                    'Subthroroughfare',
+                    'Subadministrative Area',
+                    'Area of Interest',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -64,7 +93,8 @@ class RoutineDCloud (ab.AbstractArtifact):
                 logfunc('No RoutineD Cloud Addresses data available')
 
         if version.parse(iOSversion) >= version.parse("12"):
-            cursor.execute("""
+            cursor.execute(
+                """
             select
             datetime(zrtmapitemmo.zcreationdate + 978307200, 'unixepoch'),
             datetime(zrtmapitemmo.zexpirationdate + 978307200, 'unixepoch'),
@@ -83,19 +113,56 @@ class RoutineDCloud (ab.AbstractArtifact):
             zrtmapitemmo.zuncertainty
             from zrtmapitemmo, zrtaddressmo
             where  zrtmapitemmo.z_pk == zrtaddressmo.zmapitem
-            """)
+            """
+            )
             all_rows = cursor.fetchall()
             usageentries = len(all_rows)
             data_list = []
             if usageentries > 0:
                 for row in all_rows:
-                    data_list.append((row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[13], row[14]))
+                    data_list.append(
+                        (
+                            row[0],
+                            row[1],
+                            row[2],
+                            row[3],
+                            row[4],
+                            row[5],
+                            row[6],
+                            row[7],
+                            row[8],
+                            row[9],
+                            row[10],
+                            row[11],
+                            row[12],
+                            row[13],
+                            row[14],
+                        )
+                    )
 
                 description = 'RoutineD Cloud Map Items'
                 report = ArtifactHtmlReport('Locations')
-                report.start_artifact_report(report_folder, 'RoutineD Cloud Map Items', description)
+                report.start_artifact_report(
+                    report_folder, 'RoutineD Cloud Map Items', description
+                )
                 report.add_script()
-                data_headers = ('Timestamp', 'Map Item Expiration Date', 'Map Item Name', 'Country', 'Country Code', 'Postal Code', 'Locality', 'Sublocality', 'Throroughfare', 'Subthroroughfare', 'Subadministrative Area', 'Area of Interest', 'Latitude', 'Longitude', 'Uncertainty')
+                data_headers = (
+                    'Timestamp',
+                    'Map Item Expiration Date',
+                    'Map Item Name',
+                    'Country',
+                    'Country Code',
+                    'Postal Code',
+                    'Locality',
+                    'Sublocality',
+                    'Throroughfare',
+                    'Subthroroughfare',
+                    'Subadministrative Area',
+                    'Area of Interest',
+                    'Latitude',
+                    'Longitude',
+                    'Uncertainty',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -111,8 +178,9 @@ class RoutineDCloud (ab.AbstractArtifact):
         else:
             logfunc('No RoutineD Map Items Cloud-V2.sqlite data available')
 
-        if (version.parse(iOSversion) >= version.parse("13")):
-            cursor.execute("""
+        if version.parse(iOSversion) >= version.parse("13"):
+            cursor.execute(
+                """
             select
             datetime(zrtlearnedvisitmo.zentrydate + 978307200, 'unixepoch'),
             datetime(zrtlearnedvisitmo.zexitdate + 978307200, 'unixepoch'),
@@ -153,20 +221,93 @@ class RoutineDCloud (ab.AbstractArtifact):
             and zrtlearnedplacemo.z_pk = zrtlearnedvisitmo.zplace
             and zrtaddressmo.zmapitem = zrtlearnedplacemo.zmapitem
             and zrtmapitemmo.z_pk = zrtlearnedplacemo.zmapitem
-            """)
+            """
+            )
 
             all_rows = cursor.fetchall()
             usageentries = len(all_rows)
             data_list = []
             if usageentries > 0:
                 for row in all_rows:
-                    data_list.append((row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[13], row[14], row[15], row[16], row[17], row[18], row[19], row[20], row[21], row[22], row[23], row[24], row[25], row[26], row[27], row[28], row[29], row[30], row[31], row[32]))
+                    data_list.append(
+                        (
+                            row[0],
+                            row[1],
+                            row[2],
+                            row[3],
+                            row[4],
+                            row[5],
+                            row[6],
+                            row[7],
+                            row[8],
+                            row[9],
+                            row[10],
+                            row[11],
+                            row[12],
+                            row[13],
+                            row[14],
+                            row[15],
+                            row[16],
+                            row[17],
+                            row[18],
+                            row[19],
+                            row[20],
+                            row[21],
+                            row[22],
+                            row[23],
+                            row[24],
+                            row[25],
+                            row[26],
+                            row[27],
+                            row[28],
+                            row[29],
+                            row[30],
+                            row[31],
+                            row[32],
+                        )
+                    )
 
                 description = 'Significant Locations - Vist Entry & Exit (Historical)'
                 report = ArtifactHtmlReport('Locations')
-                report.start_artifact_report(report_folder, 'RoutineD Cloud Visit Entry Exit', description)
+                report.start_artifact_report(
+                    report_folder, 'RoutineD Cloud Visit Entry Exit', description
+                )
                 report.add_script()
-                data_headers = ('Timestamp','Visit Exit','Visit Time (Minutes)','Place ID','Data Point Count','Country','Country Code','Postal Code', 'Locality','Sublocality','Throroughfare','Subthroroughfare','Subadministrative Area','Area of Interest', 'Location Uncertainty', 'Confidence','Visit Creation','Visit Expiration','Device Class','Device Model','Device Name','Learned Placed Creation', 'Learned Place Expiration','Address Creation', 'Latitude','Longitude','Map Item Creation Date','Map Item Expiration Date','Map Item Latitude','Map Item Longitude','Uncertainty','Map Item Language','Map Item Name' )
+                data_headers = (
+                    'Timestamp',
+                    'Visit Exit',
+                    'Visit Time (Minutes)',
+                    'Place ID',
+                    'Data Point Count',
+                    'Country',
+                    'Country Code',
+                    'Postal Code',
+                    'Locality',
+                    'Sublocality',
+                    'Throroughfare',
+                    'Subthroroughfare',
+                    'Subadministrative Area',
+                    'Area of Interest',
+                    'Location Uncertainty',
+                    'Confidence',
+                    'Visit Creation',
+                    'Visit Expiration',
+                    'Device Class',
+                    'Device Model',
+                    'Device Name',
+                    'Learned Placed Creation',
+                    'Learned Place Expiration',
+                    'Address Creation',
+                    'Latitude',
+                    'Longitude',
+                    'Map Item Creation Date',
+                    'Map Item Expiration Date',
+                    'Map Item Latitude',
+                    'Map Item Longitude',
+                    'Uncertainty',
+                    'Map Item Language',
+                    'Map Item Name',
+                )
                 report.write_artifact_data_table(data_headers, data_list, file_found)
                 report.end_artifact_report()
 
@@ -180,4 +321,6 @@ class RoutineDCloud (ab.AbstractArtifact):
                 kmlgen(report_folder, kmlactivity, data_list, data_headers)
 
         else:
-            logfunc('No RoutineD Significant Locations - Vist Entry & Exit (Historical)')
+            logfunc(
+                'No RoutineD Significant Locations - Vist Entry & Exit (Historical)'
+            )

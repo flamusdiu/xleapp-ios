@@ -3,15 +3,15 @@ from helpers import tsv
 
 import artifacts.artGlobals  # use to get iOS version -> iOSversion = artifacts.artGlobals.versionf
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class DHCPHotspotClients(ab.AbstractArtifact):
+class DHCPHotspotClients(ab.Artifact):
 
     _name = 'DHCP Hotspot Clients'
-    _search_dirs = ('**/private/var/db/dhcpd_leases*')
+    _search_dirs = '**/private/var/db/dhcpd_leases*'
     _category = 'DHCP'
-    _web_icon = Icon.SETTINGS
+    _web_icon = WebIcon.SETTINGS
 
     def __init__(self):
         super().__init__(self)
@@ -24,7 +24,9 @@ class DHCPHotspotClients(ab.AbstractArtifact):
             for line in filefrom:
                 cline = line.strip()
                 if cline == "{":
-                    reportval = reportval + ("<table><tr><td>Key</td><td>Values</td></tr>")
+                    reportval = reportval + (
+                        "<table><tr><td>Key</td><td>Values</td></tr>"
+                    )
                 elif cline == "}":
                     reportval = reportval + ("</table>")
                     data_list.append((reportval,))
@@ -41,7 +43,9 @@ class DHCPHotspotClients(ab.AbstractArtifact):
             report.start_artifact_report(report_folder, 'Hotspot Clients')
             report.add_script()
             data_headers = ('Hotspot Clients',)
-            report.write_artifact_data_table(data_headers, data_list, file_found, html_escape=False)
+            report.write_artifact_data_table(
+                data_headers, data_list, file_found, html_escape=False
+            )
             report.end_artifact_report()
 
             tsvname = 'DHCP Hotspot Clients'

@@ -5,12 +5,12 @@ import biplist
 from html_report.artifact_report import ArtifactHtmlReport
 from helpers import timeline, tsv
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class SafariRecentWebSearches (ab.AbstractArtifact):
+class SafariRecentWebSearches(ab.Artifact):
     _name = 'Safari Recent WebSearches'
-    _search_dirs = ('**/Library/Preferences/com.apple.mobilesafari.plist')
+    _search_dirs = '**/Library/Preferences/com.apple.mobilesafari.plist'
     _category = 'Safari Browser'
 
     def get(self, files_found, seeker):
@@ -28,14 +28,17 @@ class SafariRecentWebSearches (ab.AbstractArtifact):
                         term = search.get('SearchString', '')
                         date = search.get('Date', '')
                         data_list.append((date, term))
-                except (biplist.InvalidPlistException, plistlib.InvalidFileException) as ex:
+                except (
+                    biplist.InvalidPlistException,
+                    plistlib.InvalidFileException,
+                ) as ex:
                     logfunc(f'Failed to read plist {file_found} ' + str(ex))
 
         if data_list:
             report = ArtifactHtmlReport('Safari Recent WebSearches')
             report.start_artifact_report(report_folder, 'Recent WebSearches')
             report.add_script()
-            data_headers = ('Date','Search Term')
+            data_headers = ('Date', 'Search Term')
             report.write_artifact_data_table(data_headers, data_list, file_found)
             report.end_artifact_report()
 

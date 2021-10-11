@@ -6,10 +6,10 @@ import sqlite3
 from html_report.artifact_report import ArtifactHtmlReport
 from helpers import is_platform_windows, open_sqlite_db_readonly, timeline, tsv
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class TitleAppNetDB(ab.AbstractArtifact):
+class TitleAppNetDB(ab.Artifact):
     _name = 'Tile App Account Information'
     _search_dirs = '*/private/var/mobile/Containers/Shared/AppGroup/*/com.thetxleapp.tile-TileNetworkDB.sqlite*'
     _category = 'Accounts'

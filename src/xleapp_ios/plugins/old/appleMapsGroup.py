@@ -5,14 +5,14 @@ from helpers import tsv
 from xleapp.html_report import Icon
 from html_report.artifact_report import ArtifactHtmlReport
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class AppleMapsGroup(ab.AbstractArtifact):
+class AppleMapsGroup(ab.Artifact):
     _name = 'Apple Maps Group'
     _search_dirs = '**/Shared/AppGroup/*/Library/Preferences/group.com.apple.Maps.plist'
     _category = 'Locations'
-    _web_icon = Icon.MAP_PIN
+    _web_icon = WebIcon.MAP_PIN
 
     def __init__(self):
         super().__init__(self)

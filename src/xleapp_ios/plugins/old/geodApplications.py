@@ -5,15 +5,14 @@ import sqlite3
 
 from html_report.artifact_report import ArtifactHtmlReport
 from packaging import version
-from helpers import(is_platform_windows,
-                             open_sqlite_db_readonly, timeline, tsv)
+from helpers import is_platform_windows, open_sqlite_db_readonly, timeline, tsv
 
 import artifacts.artGlobals
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class GeodApplication(ab.AbstractArtifact):
+class GeodApplication(ab.Artifact):
 
     _name = 'GeoD Application'
     _search_dirs = '**/AP.db'
@@ -24,23 +23,26 @@ class GeodApplication(ab.AbstractArtifact):
         db = open_sqlite_db_readonly(file_found)
         cursor = db.cursor()
         cursor.execute(
-        """
+            """
         SELECT count_type, app_id, createtime
         FROM mkcount
-        """)
+        """
+        )
 
         all_rows = cursor.fetchall()
         usageentries = len(all_rows)
         data_list = []
         if usageentries > 0:
             for row in all_rows:
-                data_list.append((row[2], row[0], row[1] ))
+                data_list.append((row[2], row[0], row[1]))
                 description = ''
             report = ArtifactHtmlReport('Geolocation')
             report.start_artifact_report(report_folder, 'Applications', description)
             report.add_script()
             data_headers = ("Creation Time", "Count ID", "Application")
-            report.write_artifact_data_table(data_headers, data_list, file_found, html_escape = False)
+            report.write_artifact_data_table(
+                data_headers, data_list, file_found, html_escape=False
+            )
             report.end_artifact_report()
 
             tsvname = 'Geolocation Applications'

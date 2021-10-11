@@ -2,15 +2,15 @@ from helpers.db import open_sqlite_db_readonly
 from helpers import timeline, tsv
 from xleapp.html_report import Icon
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class DataUsageProcessA(ab.AbstractArtifact):
+class DataUsageProcessA(ab.Artifact):
 
     _name = 'Data Usage Process'
     _search_dirs = '**/DataUsage-watch.sqlite'
     _category = 'Data Usage'
-    _web_icon = Icon.WIFI
+    _web_icon = WebIcon.WIFI
 
     def __init__(self):
         super().__init__(self)

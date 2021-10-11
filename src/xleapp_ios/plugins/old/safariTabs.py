@@ -6,15 +6,14 @@ import plistlib
 import sqlite3
 
 from html_report.artifact_report import ArtifactHtmlReport
-from helpers import(is_platform_windows,
-                             open_sqlite_db_readonly, timeline, tsv)
+from helpers import is_platform_windows, open_sqlite_db_readonly, timeline, tsv
 
-from artifacts.Artifact import AbstractArtifact
+from artifacts.Artifact import Artifact
 
 
-class SafariTabs (ab.AbstractArtifact):
+class SafariTabs(ab.Artifact):
     _name = 'Safari Tabs'
-    _search_dirs = ('**/Safari/BrowserState.db')
+    _search_dirs = '**/Safari/BrowserState.db'
     _category = 'Safari Browser'
 
     def get(self, files_found, seeker):
@@ -22,7 +21,8 @@ class SafariTabs (ab.AbstractArtifact):
         db = open_sqlite_db_readonly(file_found)
         cursor = db.cursor()
 
-        cursor.execute("""
+        cursor.execute(
+            """
         select
         datetime(last_viewed_time+978307200,'unixepoch'),
         title,
@@ -32,7 +32,8 @@ class SafariTabs (ab.AbstractArtifact):
         private_browsing
         from
         tabs
-        """)
+        """
+        )
 
         all_rows = cursor.fetchall()
         usageentries = len(all_rows)
@@ -45,7 +46,14 @@ class SafariTabs (ab.AbstractArtifact):
             report = ArtifactHtmlReport('Safari Browser Tabs')
             report.start_artifact_report(report_folder, 'Tabs', description)
             report.add_script()
-            data_headers = ('Last Viewed Time','Title','URL','User Visible URL','Opened from Link', 'Private Browsing')
+            data_headers = (
+                'Last Viewed Time',
+                'Title',
+                'URL',
+                'User Visible URL',
+                'Opened from Link',
+                'Private Browsing',
+            )
             report.write_artifact_data_table(data_headers, data_list, file_found)
             report.end_artifact_report()
 
