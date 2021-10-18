@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "xleapp-ios"
-version = "0.1.0-alpha"
+version = "0.1.0-alpha.2"
 description = "iOS Artifacts for xLEAPP (free)"
 authors = ["Jesse Spangenberger <azuleonyx@digitalforensics.io>"]
 license = "MIT"

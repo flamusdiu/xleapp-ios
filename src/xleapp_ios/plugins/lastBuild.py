@@ -28,7 +28,7 @@ class LastBuild(Artifact):
 
 @core_artifact
 @dataclass
-class ITunesBackupInfo(Artifact):
+class ItunesBackupInfo(Artifact):
     def __post_init__(self):
         self.name = "iTunesBackup"
         self.category = "IOS Build"
