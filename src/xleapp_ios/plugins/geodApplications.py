@@ -11,7 +11,6 @@ class GeodApplication(Artifact):
         self.web_icon = WebIcon.GRID
         self.report_headers = ("Creation Time", "Count ID", "Application")
 
-    @timed
     @Search("**/com.apple.geod/AP.db")
     def process(self):
         for fp in self.found:

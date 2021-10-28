@@ -18,7 +18,6 @@ class Accounts(Artifact):
             "Bundle ID",
         )
 
-    @timed
     @Search("**/Accounts3.sqlite")
     def process(self):
         for fp in self.found:

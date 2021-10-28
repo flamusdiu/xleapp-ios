@@ -17,7 +17,6 @@ class AppConduit(Artifact):
             ("Time", "Device interaction", "Device ID", "Log File Name"),
         ]
 
-    @timed
     @Search("**/AppConduit.log.*", file_names_only=True)
     def process(self):
         data_list = []

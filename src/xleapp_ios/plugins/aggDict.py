@@ -17,7 +17,6 @@ class AggDict(Artifact):
             "Distribution Values Table ID",
         )
 
-    @timed
     @Search("*/AggregateDictionary/ADDataStore.sqlitedb")
     def process(self):
         for fp in self.found:

@@ -21,7 +21,6 @@ class AppGroupListing(Artifact):
         self.report_title = "Bundle ID by AppGroup & PluginKit IDs"
         self.web_icon = WebIcon.PACKAGE
 
-    @timed
     @Search(
         "*/private/var/mobile/Containers/Shared/AppGroup/*/*.metadata.plist",
         "**/PluginKitPlugin/*.metadata.plist",

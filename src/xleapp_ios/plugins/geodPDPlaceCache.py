@@ -18,7 +18,6 @@ class GeodPDPlaceCache(Artifact):
             "pd place",
         )
 
-    @timed
     @Search("**/com.apple.geod/PDPlaceCache.db")
     def process(self):
         for fp in self.found:

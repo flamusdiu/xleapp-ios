@@ -30,7 +30,6 @@ class GeodMapTiles(Artifact):
             # "ETAG"
         )
 
-    @timed
     @Search("**/com.apple.geod/MapTiles/MapTiles.sqlitedb")
     def process(self):
         for fp in self.found:

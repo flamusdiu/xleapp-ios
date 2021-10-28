@@ -12,7 +12,6 @@ class LastBuild(Artifact):
         self.name = "Last Build"
         self.category = "IOS Build"
 
-    @timed
     @Search("*LastBuildInfo.plist")
     def process(self):
         data_list = []
@@ -33,7 +32,6 @@ class ItunesBackupInfo(Artifact):
         self.name = "iTunesBackup"
         self.category = "IOS Build"
 
-    @timed
     @Search("*LastBuildInfo.plist")
     def process(self):
         data_list = []

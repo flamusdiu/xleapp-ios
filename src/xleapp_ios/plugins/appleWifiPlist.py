@@ -156,7 +156,6 @@ class AppleWifiKnownNetworks(Artifact):
         self.report_title = "WiFi Known Networks"
         self.web_icon = WebIcon.WIFI
 
-    @timed
     @Search(
         "**/com.apple.wifi.plist",
         "**/com.apple.wifi-networks.plist.backup",
@@ -203,7 +202,6 @@ class AppleWifiScannedPrivate(Artifact):
         self.report_title = "Wifi Networks Scanned (private)"
         self.web_icon = WebIcon.WIFI
 
-    @timed
     @Search(
         "**/com.apple.wifi.plist",
         "**/com.apple.wifi-networks.plist.backup",

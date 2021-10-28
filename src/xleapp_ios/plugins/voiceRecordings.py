@@ -14,7 +14,6 @@ class VoiceRecording(Artifact):
         self.report_title = "Voice Recordings"
         self.web_icon = WebIcon.MIC
 
-    @timed
     @Search(
         "**/Recordings/*.composition/manifest.plist",
         "**/Recordings/*.m4a",

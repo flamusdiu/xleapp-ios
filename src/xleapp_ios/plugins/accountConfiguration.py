@@ -11,7 +11,6 @@ class AccountConfiguration(Artifact):
         self.category = "Accounts"
         self.web_icon = WebIcon.USER
 
-    @timed
     @Search("**/com.apple.accounts.exists.plist")
     def process(self):
         data_list = []

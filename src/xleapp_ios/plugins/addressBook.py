@@ -20,7 +20,6 @@ class AddressBook(Artifact):
             "Storage Place",
         )
 
-    @timed
     @Search("**/AddressBook.sqlitedb")
     def process(self):
         for fp in self.found:

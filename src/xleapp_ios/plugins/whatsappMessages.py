@@ -28,7 +28,6 @@ class WhatsappMessages(Artifact):
         self.kml = True
         self.timeline = True
 
-    @timed
     @Search(
         "*/var/mobile/Containers/Shared/AppGroup/*/ChatStorage.sqlite*",
         "*/var/mobile/Containers/Shared/AppGroup/*/Message/Media/*/*/*/*.*",

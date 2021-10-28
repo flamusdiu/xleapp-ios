@@ -10,7 +10,6 @@ class AggDictPasscodeType(Artifact):
         self.category = "Aggregate Dictionary"
         self.web_icon = WebIcon.BOOK
 
-    @timed
     @Search("*/AggregateDictionary/ADDataStore.sqlitedb")
     def process(self):
         for fp in self.found:
