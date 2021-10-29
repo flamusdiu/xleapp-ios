@@ -1,10 +1,8 @@
 import plistlib
-from dataclasses import dataclass
 
-from xleapp import Artifact, Search, WebIcon, timed
+from xleapp import Artifact, Search, WebIcon
 
 
-@dataclass
 class AccountConfiguration(Artifact):
     def __post_init__(self):
         self.name = "Account Configuration"

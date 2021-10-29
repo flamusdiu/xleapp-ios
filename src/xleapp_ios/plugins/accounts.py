@@ -1,9 +1,6 @@
-from dataclasses import dataclass
-
-from xleapp import Artifact, Search, WebIcon, timed
+from xleapp import Artifact, Search, WebIcon
 
 
-@dataclass
 class Accounts(Artifact):
     def __post_init__(self):
         self.name = "Accounts"

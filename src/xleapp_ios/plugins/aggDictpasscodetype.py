@@ -1,9 +1,6 @@
-from dataclasses import dataclass
-
-from xleapp import Artifact, WebIcon, Search, timed
+from xleapp import Artifact, WebIcon, Search
 
 
-@dataclass
 class AggDictPasscodeType(Artifact):
     def __post_init__(self):
         self.name = "Aggregate Dictionary Passcode Type"

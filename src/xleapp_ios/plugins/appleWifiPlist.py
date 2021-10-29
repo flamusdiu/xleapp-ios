@@ -1,11 +1,10 @@
 import logging
 import plistlib
-from dataclasses import dataclass
+
 import os
-from xleapp import Artifact, WebIcon, Search, timed
+from xleapp import Artifact, WebIcon, Search
 
 
-@dataclass
 class KnownNetwork:
     ssid: str = ""
     bssid: str = ""
@@ -50,7 +49,6 @@ class KnownNetwork:
         return [val for _, val in self.__dict__.items()]
 
 
-@dataclass
 class ScannedNetwork:
     ssid: str = ""
     bssid: str = ""
@@ -129,7 +127,6 @@ def _bytes_to_mac_address(encoded_bytes):
     return to_return
 
 
-@dataclass
 class AppleWifiKnownNetworks(Artifact):
     def __post_init__(self):
         self.name = "Wifi Known Networks"
@@ -181,7 +178,6 @@ class AppleWifiKnownNetworks(Artifact):
         self.data = known_networks
 
 
-@dataclass
 class AppleWifiScannedPrivate(Artifact):
     def __post_init__(self):
         self.name = "Wifi Networks Scanned (private)"

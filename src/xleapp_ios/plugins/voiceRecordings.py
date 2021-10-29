@@ -1,11 +1,10 @@
 import plistlib
-from dataclasses import dataclass
+
 from datetime import datetime
 
-from xleapp import Artifact, WebIcon, Search, timed
+from xleapp import Artifact, WebIcon, Search
 
 
-@dataclass
 class VoiceRecording(Artifact):
     def __post_init__(self):
         self.name = "Voice Recordings"

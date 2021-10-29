@@ -1,11 +1,10 @@
 import datetime
 import re
-from dataclasses import dataclass
-
-from xleapp import Artifact, Search, WebIcon, timed
 
 
-@dataclass
+from xleapp import Artifact, Search, WebIcon
+
+
 class AppConduit(Artifact):
     def __post_init__(self):
 

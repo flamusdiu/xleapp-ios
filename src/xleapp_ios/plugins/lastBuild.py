@@ -1,12 +1,11 @@
 import datetime
 import plistlib
-from dataclasses import dataclass
 
-from xleapp import Artifact, Search, core_artifact, timed
+
+from xleapp import Artifact, Search, core_artifact
 
 
 @core_artifact
-@dataclass
 class LastBuild(Artifact):
     def __post_init__(self):
         self.name = "Last Build"
@@ -26,7 +25,6 @@ class LastBuild(Artifact):
 
 
 @core_artifact
-@dataclass
 class ItunesBackupInfo(Artifact):
     def __post_init__(self):
         self.name = "iTunesBackup"

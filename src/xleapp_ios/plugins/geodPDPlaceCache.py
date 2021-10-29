@@ -1,10 +1,7 @@
-from dataclasses import dataclass
-
 import xleapp.helpers.strings as strings
-from xleapp import Artifact, WebIcon, Search, timed
+from xleapp import Artifact, WebIcon, Search
 
 
-@dataclass
 class GeodPDPlaceCache(Artifact):
     def __post_init__(self):
         self.name = "PD Place Cache"

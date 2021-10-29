@@ -3,14 +3,13 @@ import gzip
 import logging
 import struct
 import zlib
-from dataclasses import dataclass
 
-from xleapp import Artifact, WebIcon, Search, timed
+
+from xleapp import Artifact, WebIcon, Search
 
 logger = logging.getLogger("xleapp.logfile")
 
 
-@dataclass
 class GeodMapTiles(Artifact):
     def __post_init__(self):
         self.name = "GeoD Map Tiles"

@@ -1,13 +1,12 @@
 import pathlib
 import plistlib
 import sys
-from dataclasses import dataclass
+
 
 import biplist
-from xleapp import Artifact, WebIcon, Search, timed
+from xleapp import Artifact, WebIcon, Search
 
 
-@dataclass
 class AppGroupListing(Artifact):
     def __post_init__(self):
         self.name = "App Group Listing"

@@ -1,11 +1,10 @@
 from collections import defaultdict
-from dataclasses import dataclass
+
 from pathlib import Path
 
-from xleapp import Artifact, Search, WebIcon, open_sqlite_db_readonly, timed
+from xleapp import Artifact, Search, WebIcon, open_sqlite_db_readonly
 
 
-@dataclass
 class WhatsappMessages(Artifact):
     def __post_init__(self):
         self.name = "Whatsapp - Messages"

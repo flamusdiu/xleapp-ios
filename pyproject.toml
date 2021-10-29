@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "xleapp-ios"
-version = "0.1.0-alpha.2"
+version = "0.1.0-alpha.3"
 description = "iOS Artifacts for xLEAPP (free)"
 authors = ["Jesse Spangenberger <azuleonyx@digitalforensics.io>"]
 license = "MIT"
@@ -29,4 +29,4 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry.plugins]
 
 [tool.poetry.plugins."xleapp.plugins"]
-"ios" = "xleapp_ios.plugins:plugins"
+"ios" = "xleapp_ios.plugins:IosPlugin"
