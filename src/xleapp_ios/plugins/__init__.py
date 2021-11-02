@@ -25,6 +25,5 @@ class IosPlugin(Plugin):
                         ArtifactError("Info.plist not found for iTunes Backup!")
                     else:
                         artifacts['LAST_BUILD'].select = False
-                    # noqa GuiWindow.SetProgressBar(categories_searched * ratio)
             else:
                 artifacts['ITUNES_BACKUP_INFO'].select = False
