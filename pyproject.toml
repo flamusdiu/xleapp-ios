@@ -21,6 +21,7 @@ pyliblzfse = "^0.4.1"
 
 [tool.poetry.dev-dependencies]
 xleapp = {path = "../..", develop = true}
+black = "^21.10b0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
