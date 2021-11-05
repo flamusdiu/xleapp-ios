@@ -1,8 +1,7 @@
 import logging
 import plistlib
 
-import os
-from xleapp import Artifact, WebIcon, Search
+from xleapp import Artifact, Search, WebIcon
 
 
 class KnownNetwork:
@@ -76,25 +75,23 @@ class ScannedNetwork:
         )
 
         private_mac_address = network.get("PRIVATE_MAC_ADDRESS", "")
-        if bool(private_mac_address):
+        if private_mac_address:
             self.private_mac_in_use = str(
                 _bytes_to_mac_address(
                     private_mac_address.get("PRIVATE_MAC_ADDRESS_IN_USE", ""),
                 ),
             )
-            self.private_mac_value = getattr(
+            self.private_mac_value = (
                 str(
                     _bytes_to_mac_address(
                         private_mac_address.get("PRIVATE_MAC_ADDRESS_VALUE", ""),
                     ),
                 ),
-                "",
             )
-            self.private_mac_valid = getattr(
+            self.private_mac_valid = (
                 str(
                     private_mac_address.get("PRIVATE_MAC_ADDRESS_VALID", ""),
                 ),
-                "",
             )
 
     def attributes(self) -> list[str]:
@@ -171,9 +168,7 @@ class AppleWifiKnownNetworks(Artifact):
                     network.plist = fp().name
                     known_networks.append(network.attributes())
             except KeyError:
-                self.log(
-                    logging.INFO, "No networks found in plist.", location="no_filter"
-                )
+                self.log(logging.INFO, "-> No networks found in plist.")
 
         self.data = known_networks
 
