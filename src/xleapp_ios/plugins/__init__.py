@@ -10,7 +10,7 @@ from zipfile import ZipFile
 
 from xleapp.artifacts import ArtifactError, Artifacts
 from xleapp.helpers.db import open_sqlite_db_readonly
-from xleapp.helpers.search import FileSearchProvider, FileSeekerBase
+from xleapp.helpers.search import FileSeekerBase
 from xleapp.helpers.utils import is_platform_windows
 from xleapp.plugins import Plugin
 
@@ -20,6 +20,8 @@ logger = logging.getLogger("xleapp.logfile")
 class IosPlugin(Plugin):
     def __init__(self) -> None:
         super().__init__()
+
+        self.register_seekers("ITUNES", FileSeekerItunes())
 
     @property
     def folder(self) -> Path:
@@ -43,9 +45,6 @@ class IosPlugin(Plugin):
                         artifacts['LAST_BUILD'].select = False
             else:
                 artifacts['ITUNES_BACKUP_INFO'].select = False
-
-    def register_seekers(self, search_providers: FileSearchProvider) -> None:
-        search_providers.register_builder("ITUNES", FileSeekerItunes())
 
 
 class FileSeekerItunes(FileSeekerBase):
