@@ -2,7 +2,7 @@ import plistlib
 
 from datetime import datetime
 
-from xleapp import Artifact, WebIcon, Search
+from xleapp import Artifact, Search, WebIcon
 
 
 class VoiceRecording(Artifact):

@@ -1,4 +1,4 @@
-from xleapp import Artifact, WebIcon, Search
+from xleapp import Artifact, Search, WebIcon
 
 
 class GeodApplication(Artifact):

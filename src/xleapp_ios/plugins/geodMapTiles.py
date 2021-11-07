@@ -4,8 +4,8 @@ import logging
 import struct
 import zlib
 
+from xleapp import Artifact, Search, WebIcon
 
-from xleapp import Artifact, WebIcon, Search
 
 logger = logging.getLogger("xleapp.logfile")
 
@@ -146,8 +146,7 @@ def parsevmp4(data):
             else:
                 places_data = item_data[1:]
             return [
-                x.decode("UTF8", "ignore")
-                for x in places_data.rstrip(b"\0").split(b"\0")
+                x.decode("UTF8", "ignore") for x in places_data.rstrip(b"\0").split(b"\0")
             ]
         pos += 10
     return []

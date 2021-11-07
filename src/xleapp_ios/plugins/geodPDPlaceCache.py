@@ -1,5 +1,6 @@
 import xleapp.helpers.strings as strings
-from xleapp import Artifact, WebIcon, Search
+
+from xleapp import Artifact, Search, WebIcon
 
 
 class GeodPDPlaceCache(Artifact):
@@ -33,8 +34,6 @@ class GeodPDPlaceCache(Artifact):
             if usageentries > 0:
                 data_list = []
                 for row in all_rows:
-                    pd_place = "".join(
-                        f"{row}<br>" for row in set(strings.print(row[4]))
-                    )
+                    pd_place = "".join(f"{row}<br>" for row in set(strings.print(row[4])))
                     data_list.append((row[2], row[0], row[1], row[3], pd_place))
                 self.data = data_list
