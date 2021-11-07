@@ -7,6 +7,12 @@ license = "MIT"
 
 readme = "README.md"
 
+homepage = "https://github.com/flamusdiu/xleapp"
+repository = "https://github.com/flamusdiu/xleapp-ios"
+documentation = "https://github.com/flamusdiu/xleapp"
+
+keywords = ["forensics", "dfir", "security", "framework"]
+
 [tool.poetry.dependencies]
 python = "^3.9"
 astc-decomp = "^1.0.3"
@@ -20,6 +26,20 @@ pillow = "^8.3.2"
 pyliblzfse = "^0.4.1"
 
 [tool.poetry.dev-dependencies]
+# See: https://github.com/flakehell/flakehell/pull/20
+flake8 = "<3.9.0"
+flake8-bandit = "^2.1.2"
+flake8-bugbear = "^21.9.2"
+flake8-commas = "^2.1.0"
+flake8-comprehensions = "^3.7.0"
+flake8-docstrings = "^1.6.0"
+flake8-isort = "^4.1.1"
+flake8-mutable = "^1.2.0"
+flake8-pytest-style = "^1.5.0"
+flake8-quotes = "^3.3.0"
+flake8-variables-names = "^0.0.4"
+flakehell = "^0.9.0"
+mypy = "0.910"
 xleapp = {path = "../..", develop = true}
 black = "^21.10b0"
 
@@ -31,3 +51,87 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.plugins."xleapp.plugins"]
 "ios" = "xleapp_ios.plugins:IosPlugin"
+
+[tool.flakehell]
+# Added per https://githubmemory.com/repo/flakehell/flakehell/issues/10
+# exclude chat_rendering.py until tested/fixed
+extended_default_ignore=["chat_rendering.py"] 
+format = "grouped"
+max_line_length = 90
+show_source = true
+docstring-convention = "google"
+inline-quotes = "double"
+max_complexity = 12
+
+# C901: skip checking for too complex functions on artifact files.
+# D107: don't need docstrings for __init__ method of classes. 
+#       Infavor of documenting at the top of classes instead of inside __init__ methods.
+# D203: 1 blank line required before class docstring.
+# E203: Whitespace before ":"
+# E611: No name %r in module %r
+# E1101: %s %r has no %r member
+# E401: Multiple imports on one line
+# E1102: %s is not callable
+# E1123: Passing unexpected keyword argument %r in function call
+# F401: Module imported but unused.
+# W503: Line breaks should occur after the binary operator to keep 
+#       all variable names aligned. Disabled infavor of W504 (PEP8 updates)
+# Q000: Remove bad quotes
+[tool.flakehell.plugins]
+flake8-bandit = ["+*"]
+flake8-bugbear = ["+*"]
+flake8-builtins = ["+*"]
+flake8-commas = ["+*"]
+flake8-comprehensions = ["+*"]
+flake8-darglint = ["+*"]
+flake8-docstrings = ["-+*", "-D107"]
+flake8-eradicate = ["+*"]
+flake8-isort = ["+*"]
+flake8-mutable = ["+*"]
+flake8-pytest-style = ["+*"]
+flake8-quotes = ["+*", "-Q000"]
+flake8-variables-names = ["+*"]
+mccabe = ["+*"]
+pep8-naming = ["+*"]
+pycodestyle = ["+*", "-D203", "-W503", "-E501", "-E203"]
+pyflakes = ["+*"]
+pylint = ["+F*", "+E*", "-E0611", "-E1101", "-E0401", "-E1102", "-E1123"]
+
+[tool.flakehell.exceptions."**/__init__.py"]
+pyflakes = ["-F401", "-E501"]
+
+[tool.flakehell.exceptions."**/plugins/*.py"]
+pyflakes = ["-C901"]
+
+[tool.isort]
+profile = "black"
+atomic = true
+lines_after_imports = 2
+lines_between_types = 1
+use_parentheses = true
+line_length = 90
+include_trailing_comma = true
+skip = [".eggs",
+        ".git",
+        ".venv",
+        "_build"]
+src_paths = "src"
+
+[tool.black]
+line_length = 90
+include = '\.pyi?$'
+target_version = ["py39"]
+exclude = '''
+/(
+    | \.eggs         # exclude a few common directories in the
+    | \.git          # root of the project
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+)/
+'''
+
+[tool.mypy]
+python_version = 3.9
+strict_optional = true
