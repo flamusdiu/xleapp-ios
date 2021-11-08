@@ -3,7 +3,7 @@ from xleapp import Artifact, Search, WebIcon
 
 class ApplePodcastsShows(Artifact):
     def __post_init__(self):
-        self.name = "Apple Podcasts - Shows"
+        self.name = "Shows"
         self.category = "Apple Podcasts"
         self.web_icon = WebIcon.PLAY_CIRCLE
         self.report_headers = (
@@ -41,7 +41,7 @@ class ApplePodcastsShows(Artifact):
             all_rows = cursor.fetchall()
         if len(all_rows) > 0:
             data_list = []
-            for row in all_rows():
+            for row in all_rows:
                 data_list.append(
                     (
                         row[0],

@@ -36,11 +36,15 @@ class AppleMapsGroup(Artifact):
                         '7': {'type': 'int', 'name': ''},
                     },
                     'name': '',
-                }
+                },
             }
-            internal_deserialized_plist, di = blackboxprotobuf.decode_message(
-                (deserialized_plist['MapsActivity']), types
-            )
+            try:
+                internal_deserialized_plist, di = blackboxprotobuf.decode_message(
+                    (deserialized_plist['MapsActivity']), types
+                )
+            except KeyError:
+                self.log(message="-> No data in Apple Maps Groups!")
+                return
 
             latitude = internal_deserialized_plist['1']['5']['Latitude']
             longitude = internal_deserialized_plist['1']['5']['Longitude']

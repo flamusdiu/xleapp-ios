@@ -5,7 +5,7 @@ from xleapp import Artifact, Search, WebIcon
 
 class AppleWalletCards(Artifact):
     def __post_init__(self):
-        self.name = "Apple Wallet Cards"
+        self.name = "Cards"
         self.category = "Apple Wallet"
         self.web_icon = WebIcon.CREDIT_CARD
         self.report_headers = (

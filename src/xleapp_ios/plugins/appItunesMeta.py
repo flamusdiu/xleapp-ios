@@ -7,7 +7,7 @@ from xleapp import Artifact, Search, WebIcon
 
 class AppItunesMeta(Artifact):
     def __post_init__(self) -> None:
-        self.name = ("Itunes & Bundle Metadata",)
+        self.name = "Itunes & Bundle Metadata"
         self.description = "iTunes & Bundle ID Metadata contents for apps"
         self.category = "Installed Apps"
         self.web_icon = WebIcon.PACKAGE
@@ -30,14 +30,14 @@ class AppItunesMeta(Artifact):
 
     @Search("**/iTunesMetadata.plist", "**/BundleMetadata.plist")
     def process(self) -> None:
-        install_date = ""
-        data_list = []
+        metadata, data_list = [], []
         for fp in self.found:
-            if fp.endswith("iTunesMetadata.plist"):
+            if fp.path.name == "iTunesMetadata.plist":
                 pl = plistlib.load(fp())
 
                 purchasedate = pl.get("com.apple.iTunesStore.downloadInfo", {}).get(
-                    "purchaseDate", ""
+                    "purchaseDate",
+                    "",
                 )
                 bundleid = pl.get("softwareVersionBundleId", "")
                 itemname = pl.get("itemName", "")
@@ -54,27 +54,27 @@ class AppItunesMeta(Artifact):
                 sourceapp = pl.get("sourceApp", "")
                 sideloaded = pl.get("sideLoadedDeviceBasedVPP", "")
                 variantid = pl.get("variantID", "")
+                metadata.extend(
+                    [
+                        purchasedate,
+                        bundleid,
+                        itemname,
+                        artistname,
+                        versionnum,
+                        downloadedby,
+                        genre,
+                        factoryinstall,
+                        appreleasedate,
+                        sourceapp,
+                        sideloaded,
+                        variantid,
+                        fp.path,
+                    ],
+                )
 
-            if fp.endswith("BundleMetadata.plist"):
-                deserialized_plist = nd.deserialize_plist(fp)
+            if fp.path.name == "BundleMetadata.plist":
+                deserialized_plist = nd.deserialize_plist(fp())
                 install_date = deserialized_plist.get('installDate', '')
 
-            data_list.append(
-                (
-                    install_date,
-                    purchasedate,
-                    bundleid,
-                    itemname,
-                    artistname,
-                    versionnum,
-                    downloadedby,
-                    genre,
-                    factoryinstall,
-                    appreleasedate,
-                    sourceapp,
-                    sideloaded,
-                    variantid,
-                    fp.path,
-                )
-            )
+        data_list.append((install_date, *metadata))
         self.data = data_list
