@@ -23,10 +23,34 @@ class Alarms(Artifact):
 
     @Search("*private/var/mobile/Library/Preferences/com.apple.mobiletimerd.plist")
     def process(self) -> None:
+        def decode_repeat_schedule(repeat_schedule_value):
+            days_list = {
+                64: 'Sunday',
+                32: 'Saturday',
+                16: 'Friday',
+                8: 'Thursday',
+                4: 'Wednesday',
+                2: 'Tuesday',
+                1: 'Monday',
+            }
+            schedule = []
+
+            if repeat_schedule_value == 127:
+                schedule.append('Every Day')
+                return schedule
+            elif repeat_schedule_value == 0:
+                schedule.append('Never')
+                return schedule
+
+            for day in days_list:
+                if repeat_schedule_value > 0 and repeat_schedule_value >= day:
+                    repeat_schedule_value -= day
+                    schedule.append(days_list[day])
+            return reversed(schedule)
+
         for fp in self.found:
             pl = plistlib.load(fp())
 
-            data_list = []
             if 'MTAlarms' in pl:
                 if 'MTAlarms' in pl['MTAlarms']:
                     for alarms in pl['MTAlarms']['MTAlarms']:
@@ -39,7 +63,7 @@ class Alarms(Artifact):
                             alarms_dict['MTAlarmRepeatSchedule']
                         )
 
-                        data_list.append(
+                        self.data.append(
                             (
                                 alarm_title,
                                 alarms_dict['MTAlarmEnabled'],
@@ -51,7 +75,7 @@ class Alarms(Artifact):
                                 alarms_dict['MTAlarmIsSleep'],
                                 alarms_dict['MTAlarmBedtimeDoNotDisturb'],
                                 '',
-                            )
+                            ),
                         )
 
                 if 'MTSleepAlarm' in pl['MTAlarms']:
@@ -63,10 +87,10 @@ class Alarms(Artifact):
                         alarm_title = sleep_alarm_dict.get('MTAlarmTitle', 'Bedtime')
 
                         repeat_schedule = decode_repeat_schedule(
-                            sleep_alarm_dict['MTAlarmRepeatSchedule']
+                            sleep_alarm_dict['MTAlarmRepeatSchedule'],
                         )
 
-                        data_list.append(
+                        self.data.append(
                             (
                                 alarm_title,
                                 sleep_alarm_dict['MTAlarmEnabled'],
@@ -80,33 +104,5 @@ class Alarms(Artifact):
                                 sleep_alarm_dict['MTAlarmIsSleep'],
                                 sleep_alarm_dict['MTAlarmBedtimeDoNotDisturb'],
                                 sleep_alarm_dict['MTAlarmBedtimeFireDate'],
-                            )
+                            ),
                         )
-
-        self.data = data_list
-
-
-def decode_repeat_schedule(repeat_schedule_value):
-    days_list = {
-        64: 'Sunday',
-        32: 'Saturday',
-        16: 'Friday',
-        8: 'Thursday',
-        4: 'Wednesday',
-        2: 'Tuesday',
-        1: 'Monday',
-    }
-    schedule = []
-
-    if repeat_schedule_value == 127:
-        schedule.append('Every Day')
-        return schedule
-    elif repeat_schedule_value == 0:
-        schedule.append('Never')
-        return schedule
-
-    for day in days_list:
-        if repeat_schedule_value > 0 and repeat_schedule_value >= day:
-            repeat_schedule_value -= day
-            schedule.append(days_list[day])
-    return reversed(schedule)

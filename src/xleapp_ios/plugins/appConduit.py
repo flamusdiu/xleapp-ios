@@ -1,33 +1,34 @@
 import datetime
 import re
 
-
 from xleapp import Artifact, Search, WebIcon
 
 
 class AppConduit(Artifact):
-    def __post_init__(self):
+    def __post_init__(self) -> None:
 
         self.name = "App Conduit"
         self.category = "App Conduit"
         self.web_icon = WebIcon.ACTIVITY
+        self.description = (
+            "The AppConduit log file stores information about interactions "
+            "between iPhone and other iOS devices, i.e. Apple Watch"
+        )
         self.report_headers = [
             ("Device ID", "Device type and version", "Device extra information"),
             ("Time", "Device interaction", "Device ID", "Log File Name"),
         ]
 
-    @Search("**/AppConduit.log.*", file_names_only=True)
+    @Search("**/AppConduit.log.*", file_names_only=True, return_on_first_hit=False)
     def process(self):
         data_list = []
         device_type_and_info = []
 
         info = ""
         reg_filter = (
-            r"(([A-Za-z]+[\s]+([a-zA-Z]+[\s]+[0-9]+)[\s]+"
-            r"([0-9]+\:[0-9]+\:[0-9]+)[\s]+([0-9]{4}))([\s]+"
-            r"[\[\d\]]+[\s]+[\<a-z\>]+[\s]+[\(\w\)]+)[\s\-]+"
-            r"(((.*)(device+\:([\w]+\-[\w]+\-[\w]+\-[\w]+"
-            r"\-[\w]+))(.*)$)))"
+            r"(([A-Za-z]+[\s]+([a-zA-Z]+[\s]+[0-9]+)[\s]+([0-9]+\:[0-9]+\:[0-9]+)"
+            r"[\s]+([0-9]{4}))([\s]+[\[\d\]]+[\s]+[\<a-z\>]+[\s]+[\(\w\)]+)[\s\-]"
+            r"+(((.*)(device+\:([\w]+\-[\w]+\-[\w]+\-[\w]+\-[\w]+))(.*)$)))"
         )
 
         date_filter = re.compile(reg_filter)
@@ -59,13 +60,11 @@ class AppConduit(Artifact):
                         device_type_and_info.append(device)
 
                         info = "Connected"
-                        data = (dtime_obj, info, device_id, fp.name)
-                        data_list.append(data)
+                        data_list.append((dtime_obj, info, device_id, fp.path.name))
 
                     if "devicesAreNoLongerConnected" in values:
                         info = "Disconnected"
-                        data = (dtime_obj, info, device_id, fp.name)
-                        data_list.append(data)
+                        data_list.append((dtime_obj, info, device_id, fp.path.name))
                     # if 'Resuming because' in values:
                     #     info = 'Resumed'
                     #     data_list.append((dtime_obj,info,device_id,device_type_tmp,file_name))
@@ -78,7 +77,4 @@ class AppConduit(Artifact):
 
         device_type_and_info = list(set(device_type_and_info))
 
-        self.data = {
-            "device_type_and_info": device_type_and_info,
-            "device_connection_info": data_list,
-        }
+        self.data = [device_type_and_info, data_list]

@@ -1,8 +1,9 @@
 from xleapp import Artifact, Search, WebIcon
+from xleapp.helpers.db import dict_from_row
 
 
 class Accounts(Artifact):
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.name = "Accounts"
         self.category = "Accounts"
         self.web_icon = WebIcon.USER
@@ -14,6 +15,7 @@ class Accounts(Artifact):
             "Identifier",
             "Bundle ID",
         )
+        self.timeline = True
 
     @Search("**/Accounts3.sqlite")
     def process(self):
@@ -22,7 +24,7 @@ class Accounts(Artifact):
             cursor.execute(
                 """
                 select
-                datetime(zdate+978307200,'unixepoch','utc' ),
+                datetime(zdate+978307200,'unixepoch','utc' ) as timestamp,
                 zaccounttypedescription,
                 zusername,
                 zaccountdescription,
@@ -34,9 +36,7 @@ class Accounts(Artifact):
             )
 
             all_rows = cursor.fetchall()
-            usageentries = len(all_rows)
-            if usageentries > 0:
-                data_list = []
+            if all_rows:
                 for row in all_rows:
-                    data_list.append((row[0], row[1], row[2], row[3], row[4], row[5]))
-                self.data = data_list
+                    row_dict = dict_from_row(row)
+                    self.data.append(tuple(row_dict.values()))

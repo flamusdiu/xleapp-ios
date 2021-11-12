@@ -1,12 +1,11 @@
 from collections import defaultdict
-
 from pathlib import Path
 
 from xleapp import Artifact, Search, WebIcon, open_sqlite_db_readonly
 
 
 class WhatsappMessages(Artifact):
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.name = "Whatsapp - Messages"
         self.category = "Whatsapp"
         self.report_headers = (
@@ -24,25 +23,23 @@ class WhatsappMessages(Artifact):
             "Longitude",
         )
         self.web_icon = WebIcon.MESSAGE_SQUARE
-        self.kml = True
         self.timeline = True
 
     @Search(
-        "*/var/mobile/Containers/Shared/AppGroup/*/ChatStorage.sqlite*",
+        "*/var/mobile/Containers/Shared/AppGroup/*/ChatStorage.sqlite",
         "*/var/mobile/Containers/Shared/AppGroup/*/Message/Media/*/*/*/*.*",
         file_names_only=True,
         return_on_first_hit=False,
     )
     def process(self):
-        data_list = []
         media_list = defaultdict(set)
         files_found = self.found.copy()
         for file_found in files_found:
-            if not file_found().suffix.startswith(".sqlite"):
+            if "sqlite" not in file_found().suffix:
                 media_list[file_found().stem].add(file_found())
                 self.found.remove(file_found)
 
-            if file_found().name.endswith(".sqlite"):
+            if file_found().suffix == ".sqlite":
                 fp = str(file_found())
 
         db = open_sqlite_db_readonly(fp)
@@ -51,7 +48,7 @@ class WhatsappMessages(Artifact):
         cursor.execute(
             """
             select
-            datetime(ZMESSAGEDATE+978307200, 'UNIXEPOCH'),
+            datetime(ZMESSAGEDATE+978307200, 'UNIXEPOCH') as TIMESTAMP,
             ZISFROMME,
             ZPARTNERNAME,
             ZFROMJID,
@@ -66,34 +63,32 @@ class WhatsappMessages(Artifact):
             ZXMPPTHUMBPATH
             FROM ZWAMESSAGE
             left JOIN ZWAMEDIAITEM
-            on ZWAMESSAGE.Z_PK = ZWAMEDIAITEM.ZMESSAGE 
+            on ZWAMESSAGE.Z_PK = ZWAMEDIAITEM.ZMESSAGE
             left JOIN ZWACHATSESSION
             on ZWACHATSESSION.Z_PK = ZWAMESSAGE.ZCHATSESSION
-            """
+            """,
         )
         all_rows = cursor.fetchall()
-        usageentries = len(all_rows)
 
-        if usageentries > 0:
+        if all_rows:
             for row in all_rows:
 
-                if row[1] == 1:
+                if row["ZISFROMME"] == 1:
                     sender = "Local User"
-                    receiver = row[2]
+                    receiver = row["ZPARTNERNAME"]
                 else:
-                    sender = row[2]
+                    sender = row["ZPARTNERNAME"]
                     receiver = "Local User"
 
-                if row[8] == 5:
-                    lon = row[9]
-                    lat = row[10]
+                if row["ZMESSAGETYPE"] == 5:
+                    lon = row["ZLONGITUDE"]
+                    lat = row["ZLONGITUDE"]
                 else:
                     lat = ""
                     lon = ""
 
-                thumb = row[12]
-                attachment = row[11]
-                localpath = row[11]
+                thumb = row["ZXMPPTHUMBPATH"]
+                localpath = row["ZMEDIALOCALPATH"]
 
                 if thumb and Path(thumb).stem in media_list:
                     media_name = Path(thumb).name
@@ -109,35 +104,33 @@ class WhatsappMessages(Artifact):
                 else:
                     thumb = ""
 
-                if attachment and Path(attachment).stem in media_list:
-                    media_name = Path(attachment).name
-                    media_base_name = Path(attachment).stem
+                if localpath and Path(localpath).stem in media_list:
+                    media_name = Path(localpath).name
+                    media_base_name = Path(localpath).stem
                     media_base_path = media_list[media_base_name].pop().parent
 
                     try:
                         attachment_path = media_base_path / f"{media_name}"
                         url_src_path = self.copyfile(attachment_path, media_name)
-                        attachment = f'<img src="{url_src_path}" width="300"></img>'
+                        attachment_img = f'<img src="{url_src_path}" width="300"></img>'
                     except FileNotFoundError:
-                        attachment = ""
+                        attachment_img = ""
                 else:
-                    attachment = ""
+                    attachment_img = ""
 
-                data_list.append(
+                self.data.append(
                     (
-                        row[0],
+                        row["TIMESTAMP"],
                         sender,
-                        row[3],
+                        row["ZFROMJID"],
                         receiver,
-                        row[4],
-                        row[6],
-                        attachment,
+                        row["ZTOJID"],
+                        row["ZTEXT"],
+                        attachment_img,
                         thumb,
                         localpath,
-                        row[7],
+                        row["ZSTARRED"],
                         lat,
                         lon,
-                    )
+                    ),
                 )
-
-        self.data = data_list

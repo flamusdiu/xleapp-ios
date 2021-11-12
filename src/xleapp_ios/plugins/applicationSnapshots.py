@@ -9,7 +9,7 @@ from xleapp_ios.helpers.parsers import ktxparser
 
 
 class ApplicationSnapshots(Artifact):
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.name = "App Snapshots (screenshots)"
         self.category = "Installed Apps"
         self.web_icon = WebIcon.PACKAGE
@@ -94,14 +94,12 @@ class ApplicationSnapshots(Artifact):
                     )
                     data_list.append([app_name, fp.path, last_modified_date, jpg_path])
 
-        if len(data_list) > 0:
-            data_list_for_report = []
+        if data_list:
             for app_name, ktx_path, mod_date, img_path in data_list:
                 img_html = (
                     f'<a href="{str(img_path)}"><img src="{str(img_path)}" '
                     'class="img-fluid" style="max-height:300px; max-width:400px"></a>'
                 )
-                data_list_for_report.append(
+                self.data.append(
                     (f"{str(app_name)}", f"{str(ktx_path)}", mod_date, img_html),
                 )
-            self.data = data_list_for_report

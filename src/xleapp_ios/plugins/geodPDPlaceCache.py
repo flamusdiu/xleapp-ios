@@ -1,10 +1,11 @@
 import xleapp.helpers.strings as strings
 
 from xleapp import Artifact, Search, WebIcon
+from xleapp.helpers.db import dict_from_row
 
 
 class GeodPDPlaceCache(Artifact):
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.name = "PD Place Cache"
         self.category = "Geolocation"
         self.web_icon = WebIcon.MAP_PIN
@@ -22,18 +23,22 @@ class GeodPDPlaceCache(Artifact):
             cursor = fp().cursor()
             cursor.execute(
                 """
-                SELECT requestkey, pdplacelookup.pdplacehash, datetime('2001-01-01', "lastaccesstime" || ' seconds') as lastaccesstime, datetime('2001-01-01', "expiretime" || ' seconds') as expiretime, pdplace
+                SELECT
+                datetime('2001-01-01', "lastaccesstime" || ' seconds') as lastaccesstime,
+                requestkey,
+                pdplacelookup.pdplacehash as pdplacehash,
+                datetime('2001-01-01', "expiretime" || ' seconds') as expiretime,
+                pdplace
                 FROM pdplacelookup
                 INNER JOIN pdplaces on pdplacelookup.pdplacehash = pdplaces.pdplacehash
                 """,
             )
 
             all_rows = cursor.fetchall()
-            usageentries = len(all_rows)
-
-            if usageentries > 0:
-                data_list = []
+            if all_rows:
                 for row in all_rows:
-                    pd_place = "".join(f"{row}<br>" for row in set(strings.print(row[4])))
-                    data_list.append((row[2], row[0], row[1], row[3], pd_place))
-                self.data = data_list
+                    pd_place = "".join(
+                        f"{pd_row}<br>" for pd_row in set(strings.print(row["pdplace"]))
+                    )
+                    row_dict = dict_from_row(row)
+                    self.data.append((*tuple(row_dict.values())[:4], pd_place))

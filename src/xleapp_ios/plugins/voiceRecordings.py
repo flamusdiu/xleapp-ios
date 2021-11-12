@@ -1,12 +1,11 @@
 import plistlib
 
-from datetime import datetime
-
 from xleapp import Artifact, Search, WebIcon
+from xleapp.helpers.utils import unix_epoch_to_readable_date
 
 
 class VoiceRecording(Artifact):
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.name = "Voice Recordings"
         self.category = "Voice-Recordings"
         self.report_headers = ("Creation Date", "Title", "Path to File", "Audio File")
@@ -19,19 +18,17 @@ class VoiceRecording(Artifact):
         file_names_only=True,
     )
     def process(self):
-        data_list = []
         plist_files = []
         m4a_files = []
 
-        for file_found in self.found:
-            if file_found().suffix(".plist"):
-                plist_files.append(file_found())
-            elif file_found.suffix(".m4a"):
-                m4a_filename = file_found()
-                if " " in m4a_filename:
-                    m4a_filename = m4a_filename.replace(" ", "_")
+        for fp in self.found:
+            if fp.path.suffix == ".plist":
+                plist_files.append(fp())
+            elif fp.path.suffix == ".m4a":
+                m4a_filename = fp()
+                m4a_filename = m4a_filename.replace(" ", "_")
                 m4a_files.append(m4a_files)
-                self.copyfile(file_found, m4a_filename)
+                self.copyfile(fp.path, m4a_filename)
 
         plist_files.sort()
         m4a_files.sort()
@@ -48,7 +45,7 @@ class VoiceRecording(Artifact):
                     "audio elements.</p></audio>"
                 )
 
-                data_list.append(
+                self.data.append(
                     (
                         ct,
                         pl["RCSavedRecordingTitle"],
@@ -56,11 +53,3 @@ class VoiceRecording(Artifact):
                         audio,
                     ),
                 )
-
-        self.data = data_list
-
-
-def unix_epoch_to_readable_date(unix_epoch_time):
-    unix_time = float(unix_epoch_time + 978307200)
-    readable_time = datetime.utcfromtimestamp(unix_time).strftime("%Y-%m-%d %H:%M:%S")
-    return readable_time

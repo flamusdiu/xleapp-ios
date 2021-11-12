@@ -1,8 +1,9 @@
 from xleapp import Artifact, Search, WebIcon
+from xleapp.helpers.db import dict_from_row
 
 
 class ApplePodcastsEpisodes(Artifact):
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.name = "Episodes"
         self.category = "Apple Podcasts"
         self.web_icon = WebIcon.PLAY_CIRCLE
@@ -22,6 +23,7 @@ class ApplePodcastsEpisodes(Artifact):
             'Size',
             'Play State',
         )
+        self.timeline = True
 
     @Search("**/MTLibrary.sqlite")
     def process(self) -> None:
@@ -53,26 +55,7 @@ class ApplePodcastsEpisodes(Artifact):
             )
 
         all_rows = cursor.fetchall()
-        if len(all_rows) > 0:
-            data_list = []
+        if all_rows:
             for row in all_rows:
-                data_list.append(
-                    (
-                        row[0],
-                        row[1],
-                        row[2],
-                        row[3],
-                        row[4],
-                        row[5],
-                        row[6],
-                        row[7],
-                        row[8],
-                        row[9],
-                        row[10],
-                        row[11],
-                        row[12],
-                        row[13],
-                    ),
-                )
-
-        self.data = data_list
+                row_dict = dict_from_row(row)
+                self.data.append(tuple(row_dict.values()))

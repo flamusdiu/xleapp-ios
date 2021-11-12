@@ -2,21 +2,27 @@ from xleapp import Artifact, Search, WebIcon
 from xleapp.helpers.db import dict_from_row
 
 
-class GeodApplication(Artifact):
+class BluetoothOtherLe(Artifact):
     def __post_init__(self) -> None:
-        self.name = "GeoD Application"
-        self.category = "Applications"
-        self.web_icon = WebIcon.GRID
-        self.report_headers = ("Creation Time", "Count ID", "Application")
+        self.name = "Bluetooth Other LE"
+        self.category = "Bluetooth"
+        self.web_icon = WebIcon.BLUETOOTH
+        self.report_headers = ("Name", "Address", "UUID")
 
-    @Search("**/com.apple.geod/AP.db")
+    @Search("**/Library/Database/com.apple.MobileBluetooth.ledevices.other.db")
     def process(self):
         for fp in self.found:
             cursor = fp().cursor()
+
             cursor.execute(
                 """
-                SELECT count_type, app_id, createtime
-                FROM mkcount
+                    SELECT
+                    Name,
+                    Address,
+                    Uuid
+                    FROM
+                    OtherDevices
+                    order by Name desc
                 """,
             )
 

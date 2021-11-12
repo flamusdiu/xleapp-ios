@@ -7,9 +7,12 @@ from ..helpers.utils import bytes_to_mac_address
 
 
 class AppleWifiScannedPrivateNetworks(Artifact):
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.name = "Wifi Networks Scanned (private)"
-        self.description = 'WiFi networks scanned while using fake ("private") MAC address. Dates are taken straight from the source plist.'
+        self.description = (
+            "WiFi networks scanned while using fake ('private') MAC address. Dates "
+            "are taken straight from the source plist."
+        )
         self.category = "Locations"
         self.report_headers = (
             "SSID",
@@ -25,6 +28,7 @@ class AppleWifiScannedPrivateNetworks(Artifact):
         )
         self.report_title = "Wifi Networks Scanned (private)"
         self.web_icon = WebIcon.WIFI
+        self.timeline = True
 
     @Search(
         "**/com.apple.wifi.plist",
@@ -79,8 +83,8 @@ class AppleWifiScannedPrivateNetworks(Artifact):
                         ),
                     )
 
-            def attributes(self) -> list[str]:
-                return [
+            def attributes(self) -> tuple[str]:
+                return (
                     self.ssid,
                     self.bssid,
                     self.added_at,
@@ -92,20 +96,17 @@ class AppleWifiScannedPrivateNetworks(Artifact):
                     self.in_known_networks,
                     self.last_auto_joined,
                     self.plist,
-                ]
+                )
 
         for fp in self.found:
             deserialzied = plistlib.load(fp(), fmt=plistlib.FMT_BINARY)
 
-            scanned_networks = []
             try:
                 for scanned_network in deserialzied[
                     "List of scanned networks with private mac"
                 ]:
                     network = ScannedNetwork(scanned_network)
                     network.plist = fp().name
-                    scanned_networks.append(network.attributes())
+                    self.data.append(network.attributes())
             except KeyError:
                 self.log(logging.INFO, "-> No private networks scanned in plist file.")
-
-        self.data = scanned_networks

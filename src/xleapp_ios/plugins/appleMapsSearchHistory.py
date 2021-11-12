@@ -9,12 +9,15 @@ class AppleMapsSearchHistory(Artifact):
         self.category = "Locations"
         self.web_icon = WebIcon.MAP_PIN
         self.report_headers = ("Tempstamp", "Search Entry")
+        self.timeline = True
 
     @Search(
-        "*private/var/mobile/Containers/Data/Application/*/Library/Maps/GeoHistory.mapsdata"
+        (
+            "*private/var/mobile/Containers/Data/Application/*/Library/Maps/"
+            "GeoHistory.mapsdata"
+        ),
     )
     def process(self) -> None:
-        data_list = []
         for fp in self.found:
             plist_content = plistlib.load(fp())
             for entry in plist_content['MSPHistory']['records']:
@@ -32,8 +35,6 @@ class AppleMapsSearchHistory(Artifact):
                         search_entry = id_search_entry[1].split('"')
                         search_entry_split = str(search_entry[0]).split('\x12')
                         search_entry_filtered = list(filter(None, search_entry_split))
-                        data_list.append(
-                            (formatted_timestamp, ', '.join(search_entry_filtered))
+                        self.data.append(
+                            (formatted_timestamp, ', '.join(search_entry_filtered)),
                         )
-
-        self.data = data_list

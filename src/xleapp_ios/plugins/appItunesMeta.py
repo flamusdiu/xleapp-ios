@@ -30,7 +30,6 @@ class AppItunesMeta(Artifact):
 
     @Search("**/iTunesMetadata.plist", "**/BundleMetadata.plist")
     def process(self) -> None:
-        metadata, data_list = [], []
         for fp in self.found:
             if fp.path.name == "iTunesMetadata.plist":
                 pl = plistlib.load(fp())
@@ -54,27 +53,24 @@ class AppItunesMeta(Artifact):
                 sourceapp = pl.get("sourceApp", "")
                 sideloaded = pl.get("sideLoadedDeviceBasedVPP", "")
                 variantid = pl.get("variantID", "")
-                metadata.extend(
-                    [
-                        purchasedate,
-                        bundleid,
-                        itemname,
-                        artistname,
-                        versionnum,
-                        downloadedby,
-                        genre,
-                        factoryinstall,
-                        appreleasedate,
-                        sourceapp,
-                        sideloaded,
-                        variantid,
-                        fp.path,
-                    ],
-                )
+                metadata = [
+                    purchasedate,
+                    bundleid,
+                    itemname,
+                    artistname,
+                    versionnum,
+                    downloadedby,
+                    genre,
+                    factoryinstall,
+                    appreleasedate,
+                    sourceapp,
+                    sideloaded,
+                    variantid,
+                    fp.path,
+                ]
 
             if fp.path.name == "BundleMetadata.plist":
                 deserialized_plist = nd.deserialize_plist(fp())
                 install_date = deserialized_plist.get('installDate', '')
 
-        data_list.append((install_date, *metadata))
-        self.data = data_list
+        self.data.append((install_date, *metadata))

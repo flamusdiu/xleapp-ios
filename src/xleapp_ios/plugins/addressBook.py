@@ -1,8 +1,9 @@
-from xleapp import Artifact, WebIcon, Search
+from xleapp import Artifact, Search, WebIcon
+from xleapp.helpers.db import dict_from_row
 
 
 class AddressBook(Artifact):
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.name = "Address Book"
         self.category = "Address Book"
         self.web_icon = WebIcon.BOOK_OPEN
@@ -39,23 +40,10 @@ class AddressBook(Artifact):
             )
 
             all_rows = cursor.fetchall()
-            usageentries = len(all_rows)
-            if usageentries > 0:
-                data_list = []
+            if all_rows:
                 for row in all_rows:
                     an = str(row[0])
                     an = an.replace("b'", "")
                     an = an.replace("'", "")
-                    data_list.append(
-                        (
-                            an,
-                            row[1],
-                            row[2],
-                            row[3],
-                            row[4],
-                            row[5],
-                            row[6],
-                            row[7],
-                        ),
-                    )
-                self.data = data_list
+                    row_dict = dict_from_row(row)
+                    self.data.append((an, *tuple(row_dict.values())[1:]))

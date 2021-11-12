@@ -27,10 +27,8 @@ class AppleMapsApplication(Artifact):
             protobuf = pl.get('__internal__LastActivityCamera', None)
 
             if protobuf:
-                internal_plist, di = blackboxprotobuf.decode_message(protobuf, types)
+                internal_plist, _ = blackboxprotobuf.decode_message(protobuf, types)
                 latitude = internal_plist["Latitude"]
                 longitude = internal_plist["Longitude"]
 
-                data_list = []
-                data_list.append((latitude, longitude))
-        self.data = data_list
+                self.data.append((latitude, longitude))

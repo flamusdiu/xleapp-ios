@@ -1,14 +1,10 @@
-import pathlib
 import plistlib
-import sys
 
-
-import biplist
-from xleapp import Artifact, WebIcon, Search
+from xleapp import Artifact, Search, WebIcon
 
 
 class AppGroupListing(Artifact):
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.name = "App Group Listing"
         self.description = (
             "List can included once installed but not present "
@@ -25,8 +21,6 @@ class AppGroupListing(Artifact):
         "**/PluginKitPlugin/*.metadata.plist",
     )
     def process(self):
-        data_list = []
-
         for fp in self.found:
             plist = plistlib.load(fp())
             bundleid = plist["MCMMetadataIdentifier"]
@@ -36,6 +30,4 @@ class AppGroupListing(Artifact):
             fileloc = path.parent
             typedir = path.parents[1].name
 
-            data_list.append((bundleid, typedir, appgroupid, fileloc))
-
-        self.data = data_list
+            self.data.append((bundleid, typedir, appgroupid, fileloc))
