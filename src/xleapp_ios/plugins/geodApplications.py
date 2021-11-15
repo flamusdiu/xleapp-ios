@@ -5,7 +5,7 @@ from xleapp.helpers.db import dict_from_row
 class GeodApplication(Artifact):
     def __post_init__(self) -> None:
         self.name = "GeoD Application"
-        self.category = "Applications"
+        self.category = "Locations"
         self.web_icon = WebIcon.GRID
         self.report_headers = ("Creation Time", "Count ID", "Application")
 

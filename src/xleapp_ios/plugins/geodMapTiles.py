@@ -13,7 +13,7 @@ logger = logging.getLogger("xleapp.logfile")
 class GeodMapTiles(Artifact):
     def __post_init__(self) -> None:
         self.name = "GeoD Map Tiles"
-        self.category = "Geolocation"
+        self.category = "Locations"
         self.web_icon = WebIcon.MAP
         self.report_headers = (
             "Timestamp",

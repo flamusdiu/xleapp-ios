@@ -2,6 +2,7 @@ import logging
 import plistlib
 
 from xleapp import Artifact, Search, WebIcon
+from xleapp.helpers.utils import deep_get
 
 from ..helpers.utils import bytes_to_mac_address
 
@@ -51,35 +52,40 @@ class AppleWifiScannedPrivateNetworks(Artifact):
             plist: str
 
             def __init__(self, network: dict) -> None:
-                self.ssid = str(network.get("SSID_STR", ""))
-                self.bssid = str(network.get("BSSID", ""))
-                self.last_updated = str(network.get("lastUpdated", ""))
-                self.last_joined = str(network.get("lastJoined", ""))
-                self.added_at = str(network.get("addedAt", ""))
-                self.in_known_networks = str(
-                    network.get(
-                        "PresentInKnownNetworks",
-                        "",
-                    ),
-                )
-
-                private_mac_address = network.get("PRIVATE_MAC_ADDRESS", "")
-                if private_mac_address:
+                self.ssid = str(deep_get(network, "SSID_STR"))
+                self.bssid = str(deep_get(network, "BSSID"))
+                self.last_updated = str(deep_get(network, "lastUpdated"))
+                self.last_joined = str(deep_get(network, "lastJoined"))
+                self.added_at = str(deep_get("addedAt"))
+                self.in_known_networks = str(deep_get(network, "PresentInKnownNetworks"))
+                if network.get("PRIVATE_MAC_ADDRESS", ""):
                     self.private_mac_in_use = str(
                         bytes_to_mac_address(
-                            private_mac_address.get("PRIVATE_MAC_ADDRESS_IN_USE", ""),
+                            deep_get(
+                                network,
+                                "PRIVATE_MAC_ADDRESS",
+                                "PRIVATE_MAC_ADDRESS_IN_USE",
+                            ),
                         ),
                     )
                     self.private_mac_value = (
                         str(
                             bytes_to_mac_address(
-                                private_mac_address.get("PRIVATE_MAC_ADDRESS_VALUE", ""),
+                                deep_get(
+                                    network,
+                                    "PRIVATE_MAC_ADDRESS",
+                                    "PRIVATE_MAC_ADDRESS_VALUE",
+                                ),
                             ),
                         ),
                     )
                     self.private_mac_valid = (
                         str(
-                            private_mac_address.get("PRIVATE_MAC_ADDRESS_VALID", ""),
+                            deep_get(
+                                network,
+                                "PRIVATE_MAC_ADDRESS",
+                                "PRIVATE_MAC_ADDRESS_VALID",
+                            ),
                         ),
                     )
 

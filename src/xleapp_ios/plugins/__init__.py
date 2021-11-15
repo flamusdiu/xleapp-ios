@@ -4,6 +4,7 @@ import shutil
 import sqlite3
 import tarfile
 import typing as t
+
 from functools import cached_property
 from pathlib import Path
 from zipfile import ZipFile
@@ -13,6 +14,7 @@ from xleapp.helpers.db import open_sqlite_db_readonly
 from xleapp.helpers.search import FileSearchProvider, FileSeekerBase
 from xleapp.helpers.utils import is_platform_windows
 from xleapp.plugins import Plugin
+
 
 logger = logging.getLogger("xleapp.logfile")
 
@@ -32,7 +34,7 @@ class IosPlugin(Plugin):
             # Special processing for iTunesBackup Info.plist as it is a
             # separate entity, not part of the Manifest.db. Seeker won't find it
             if (
-                artifacts.app.device["type"] == "ios"
+                artifacts.app.device["Type"] == "ios"
                 and artifacts.app.extraction_type == "ITUNES"
             ):
                 if artifact.name == "ITUNES_BACKUP_INFO":

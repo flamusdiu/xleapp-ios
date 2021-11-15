@@ -30,4 +30,6 @@ class CellularWirless(Artifact):
                     "LastKnownICCID",
                     "meid",
                 ):
+                    if key in ["imei", "meid"]:
+                        key = key.upper()
                     device_info.update({key: value})

@@ -2,6 +2,7 @@ import logging
 import plistlib
 
 from xleapp import Artifact, Search, WebIcon
+from xleapp.helpers.utils import deep_get
 
 
 class AppleWifiKnownNetworks(Artifact):
@@ -56,32 +57,37 @@ class AppleWifiKnownNetworks(Artifact):
 
             def __init__(self, network: dict) -> None:
 
-                self.ssid = str(network.get("SSID_STR", ""))
-                self.bssid = str(network.get("BSSID", ""))
-                self.net_usage = str(network.get("networkUsage", ""))
+                self.ssid = str(deep_get(network, "SSID_STR"))
+                self.bssid = str(deep_get(network, "BSSID"))
+                self.net_usage = str(deep_get(network, "networkUsage"))
                 self.country_code = str(
-                    network.get("80211D_IE", {}).get("IE_KEY_80211D_COUNTRY_CODE", ""),
+                    deep_get(network, "80211D_IE", "IE_KEY_80211D_COUNTRY_CODE"),
                 )
-                self.last_updated = str(network.get("lastUpdated", ""))
-                self.last_joined = str(network.get("lastJoined", ""))
-                self.last_auto_joined = str(network.get("lastAutoJoined", ""))
-                self.wnpmd = str(
-                    network.get("WiFiNetworkPasswordModificationDate", ""),
+                self.last_updated = str(deep_get(network, "lastUpdated"))
+                self.last_joined = str(deep_get(network, "lastJoined"))
+                self.last_auto_joined = str(deep_get(network, "lastAutoJoined"))
+                self.wnpmd = str(deep_get(network, "WiFiNetworkPasswordModificationDate"))
+                self.enabled = deep_get(network, "enabled")
+                self.device_name = deep_get(
+                    network,
+                    "WPS_PROB_RESP_IE",
+                    "IE_KEY_WPS_DEV_NAME",
                 )
-                self.enabled = network.get("enabled", "")
-
-                wps_prob_resp_ie = network.get("WPS_PROB_RESP_IE", "")
-                if wps_prob_resp_ie:
-                    self.device_name = wps_prob_resp_ie.get("IE_KEY_WPS_DEV_NAME", "")
-                    self.manufacturer = wps_prob_resp_ie.get(
-                        "IE_KEY_WPS_MANUFACTURER",
-                        "",
-                    )
-                    self.serial_number = wps_prob_resp_ie.get("IE_KEY_WPS_SERIAL_NUM", "")
-                    self.model_name = wps_prob_resp_ie.get(
-                        "IE_KEY_WPS_MODEL_NAME",
-                        "",
-                    )
+                self.manufacturer = deep_get(
+                    network,
+                    "WPS_PROB_RESP_IE",
+                    "IE_KEY_WPS_MANUFACTURER",
+                )
+                self.serial_number = deep_get(
+                    network,
+                    "WPS_PROB_RESP_IE",
+                    "IE_KEY_WPS_SERIAL_NUM",
+                )
+                self.model_name = deep_get(
+                    network,
+                    "WPS_PROB_RESP_IE",
+                    "IE_KEY_WPS_MODEL_NAME",
+                )
 
             def attributes(self) -> tuple[str]:
                 return (

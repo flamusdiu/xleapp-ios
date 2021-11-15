@@ -1,15 +1,15 @@
 import datetime
 import plistlib
 
-from xleapp import Artifact, Search, core_artifact
+from xleapp import Artifact, Search, WebIcon, core_artifact
 
 
 @core_artifact
 class LastBuild(Artifact):
     def __post_init__(self) -> None:
-        self.name = "Last Build"
-        self.description = "Build Information"
+        self.name = "Build Information"
         self.category = "IOS Build"
+        self.web_icon = WebIcon.GIT_COMMIT
 
     @Search("*LastBuildInfo.plist")
     def process(self):

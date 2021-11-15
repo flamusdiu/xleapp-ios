@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "xleapp-ios"
-version = "0.1.2"
+version = "0.1.3"
 description = "iOS Artifacts for xLEAPP (free)"
 authors = ["Jesse Spangenberger <azuleonyx@digitalforensics.io>"]
 license = "MIT"
@@ -24,6 +24,7 @@ nska-deserialize = ">=1.3.1"
 pandas = "^1.3.3"
 pillow = "^8.3.2"
 pyliblzfse = "^0.4.1"
+defusedxml = "^0.7.1"
 
 [tool.poetry.dev-dependencies]
 # See: https://github.com/flakehell/flakehell/pull/20

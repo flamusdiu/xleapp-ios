@@ -6,8 +6,8 @@ from xleapp.helpers.db import dict_from_row
 
 class GeodPDPlaceCache(Artifact):
     def __post_init__(self) -> None:
-        self.name = "PD Place Cache"
-        self.category = "Geolocation"
+        self.name = "GeoD PD Place Cache"
+        self.category = "Locations"
         self.web_icon = WebIcon.MAP_PIN
         self.report_headers = (
             "last access time",
